@@ -1,0 +1,10 @@
+services:
+  finapp:
+    build: .
+    container_name: finapp
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+    # Se trocarem H2 por Postgres, adicionem um serviço "db" aqui
+    # e uma variável de ambiente apontando a datasource para ele.
