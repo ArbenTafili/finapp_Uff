@@ -1,7 +1,8 @@
 plugins {
-    kotlin("jvm") version "1.9.24"
-    kotlin("plugin.spring") version "1.9.24"
-    id("org.springframework.boot") version "3.3.4"
+    kotlin("jvm") version "2.4.10"
+    kotlin("plugin.spring") version "2.4.10"
+    kotlin("plugin.jpa") version "2.4.10"
+    id("org.springframework.boot") version "3.5.16"
     id("io.spring.dependency-management") version "1.1.6"
 }
 
@@ -9,7 +10,9 @@ group = "com.finapp"
 version = "0.1.0-SNAPSHOT"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
@@ -31,6 +34,7 @@ dependencies {
 }
 
 kotlin {
+    jvmToolchain(17)
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
     }
