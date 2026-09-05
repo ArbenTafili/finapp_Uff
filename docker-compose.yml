@@ -1,10 +1,34 @@
 services:
+  db:
+    image: postgres:16-alpine
+    container_name: finapp-db
+    environment:
+      - POSTGRES_DB=finapp
+      - POSTGRES_USER=finapp
+      - POSTGRES_PASSWORD=finapp
+    ports:
+      - "5432:5432"
+    volumes:
+      - finapp-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finapp -d finapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   finapp:
     build: .
     container_name: finapp
+    depends_on:
+      db:
+        condition: service_healthy
     ports:
       - "8080:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=default
-    # Se trocarem H2 por Postgres, adicionem um serviço "db" aqui
-    # e uma variável de ambiente apontando a datasource para ele.
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/finapp
+      - SPRING_DATASOURCE_USERNAME=finapp
+      - SPRING_DATASOURCE_PASSWORD=finapp
+
+volumes:
+  finapp-db-data:

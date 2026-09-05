@@ -15,7 +15,7 @@ Veja o Documento de Visão completo em [`docs/rodada1/01-documento-visao.md`](do
 - **Linguagem:** Kotlin
 - **Build:** Gradle
 - **Containerização:** Docker / Docker Compose
-- **Banco de dados:** (definir — sugestão: H2 ou PostgreSQL via Docker)
+- **Banco de dados:** H2 em memória (dev local) / PostgreSQL (via Docker Compose)
 
 ## Equipe e papéis
 
@@ -50,9 +50,14 @@ finapp/
 ## Como rodar o projeto
 
 ```bash
-# Build e execução via Docker Compose
+# Build e execução via Docker Compose (sobe a API + banco Postgres)
 docker compose up --build
 ```
+
+A API fica disponível em `http://localhost:8080/api` e uma interface web simples de
+demonstração (cadastrar, listar, editar e excluir transações) em `http://localhost:8080/`.
+
+Para rodar localmente sem Docker (usa H2 em memória): `./gradlew bootRun`.
 
 ## Estratégia de branches
 

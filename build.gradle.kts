@@ -26,8 +26,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    // Banco de dados — H2 em memória para desenvolvimento/demo (trocar por Postgres se preferirem)
+    // Banco de dados — H2 em memória para desenvolvimento local; Postgres para o docker-compose
     runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
