@@ -1,19 +1,35 @@
-Filipe (GP) — Papéis, cronograma, orçamento, monitoramento
+# Registro de Decisões Técnicas e de Processo (ADRs)
 
-Por que a distribuição de papéis que escolhemos? Argumentar que os papéis foram atribuídos considerando afinidade/experiência de cada um com a parte equivalente no projeto de ES anterior — isso reduz risco de curva de aprendizado e é uma decisão de alocação de recursos, não aleatória.
-Por que o cronograma tem esse formato (Gantt) e não outro? Gantt permite visualizar dependências entre pacotes de trabalho e sobreposição de iterações — essencial pra um GP acompanhar se o projeto está "on track".
-Por que já começamos o EVM/burndown na Rodada 1, mesmo com pouco código pronto? Porque monitoramento e controle não é algo que se faz só no fim — quanto antes se estabelece a baseline (PV), mais cedo desvios (SPI/CPI baixos) são detectados e corrigidos
+Este documento registra o histórico de decisões arquiteturais, técnicas e processuais tomadas ao longo das iterações do projeto **FinApp**. Os registros acumulados aqui compõem a base para a entrega formal do **Item 10 ("Dificuldades, decisões técnicas e de processo tomadas")** na Rodada 3.
 
-Decisão técnica: Validação de data em transações (RF01/UC01)
+---
 
-O UC01 especifica que a regra de negócio deve impedir "datas anteriores ao cadastro". Na implementação, identificamos uma ambiguidade: o escopo do projeto (RF01-RF05) não inclui uma entidade Usuario com autenticação/data de cadastro, o que tornaria essa regra, lida literalmente, inviável de implementar sem expandir o escopo.
+## ADR 001: Validação de Data em Transações (RF01 / UC01)
 
-Avaliamos três interpretações possíveis:
+* **Data:** 01/09/2026
+* **Status:** Aprovado
+* **Responsáveis:** Giovana Nogueira e Enzo Pavanelli
+* **Requisitos Afetados:** RF01 (Gerenciar Transações), RNF01 (Usabilidade), UC01
 
-Impedir apenas datas futuras (transação não pode ser posterior a hoje);
-Impedir datas anteriores ao instante em que o registro foi criado no banco (sem "backdating");
-Criar uma entidade Usuario simplificada apenas para guardar dataCadastro e validar contra ela.
+### 1. Contexto e Problema
+A especificação do Caso de Uso UC01 (Gerenciar Transações) determina que a regra de negócio do sistema deve impedir o registro de "datas anteriores ao cadastro". Durante o início da implementação, a equipe identificou uma ambiguidade arquitetural:
+* O escopo formal delimitado para esta fase (RF01 a RF05) não contempla uma entidade `Usuario` com fluxo de autenticação e persistência de `dataCadastro`.
+* Interpretar a restrição de forma literal tornaria a implementação inviável sem provocar *scope creep* (expansão não planejada de escopo).
 
-Decisão tomada: optamos pela interpretação (1) — impedir apenas datas futuras.
+### 2. Opções Avaliadas
+1. **Impedir apenas datas futuras:** A transação não pode ter data posterior ao dia corrente (`data <= hoje`).
+2. **Impedir datas anteriores à criação do registro:** Bloquear qualquer transação com data anterior ao instante de persistência no banco (proibição de *backdating*).
+3. **Criar entidade Usuario mínima:** Modelar e persistir uma entidade simplificada unicamente para registrar a `dataCadastro` e utilizá-la como barreira de validação.
 
-Justificativa: as opções (2) e (3) comprometeriam a usabilidade esperada (RNF01 — registro rápido) e o caso de uso real das personas levantadas em ES (ex: usuário registrar hoje um gasto de ontem). A opção (3) também introduziria escopo não previsto no Planning Poker, indo contra o princípio de escopo controlado do projeto. A decisão prioriza a experiência de uso real sobre a leitura mais restritiva do texto do UC01.
+### 3. Decisão Tomada
+Optou-se pela **Opção 1 (Impedir apenas datas futuras)**.
+
+### 4. Justificativa
+* **Usabilidade e Tempo de Registro (RNF01):** O sistema exige fluxo ágil (menos de 30 segundos por registro). A Opção 2 inviabilizaria casos de uso reais das personas mapeadas (ex.: registrar no dia seguinte despesas realizadas na véspera).
+* **Controle de Escopo e Orçamento:** A Opção 3 adicionaria esforço de modelagem, banco de dados e testes não computados no Planning Poker inicial, comprometendo a capacidade de entrega das iterações.
+* **Priorização da Experiência do Usuário:** Priorizou-se a usabilidade prática do produto em detrimento da interpretação estrita e descontextualizada do texto preliminar de requisitos.
+
+### 5. Consequências
+* A validação no backend/frontend checa apenas se `input_date <= current_date()`.
+* Redução de atrito no lançamento de despesas retroativas pelo usuário.
+* Manutenção da integridade do escopo acordado para as rodadas de entrega.
