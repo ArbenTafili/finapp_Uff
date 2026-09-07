@@ -1,10 +1,3 @@
-# Escopo do Produto e do Projeto (EAP) — FinApp
-
-**Responsáveis:** Sara (PO) + Enzo (Dev)
-
-> Este artefato define o escopo funcional do FinApp e decompõe o trabalho do projeto em pacotes técnicos identificáveis.  
-> Os IDs da EAP devem ser reutilizados nos artefatos de estimativas, cronograma, monitoramento e registro de participação, garantindo rastreabilidade entre planejamento e execução.
-
 ## Escopo do Produto (requisitos)
 
 ### RF01 — Gerenciar Transações
@@ -49,6 +42,10 @@ Não fazem parte desta EAP:
 A ausência de autenticação é intencional nesta fase. Não será criada uma entidade `Usuario` apenas para suportar regras que podem ser atendidas sem expansão do escopo.
 
 ---
+
+> Este artefato define o escopo funcional do FinApp e decompõe o trabalho do projeto em pacotes técnicos identificáveis.  
+> Os IDs da EAP devem ser reutilizados nos artefatos de estimativas, cronograma, monitoramento e registro de participação, garantindo rastreabilidade entre planejamento e execução.
+
 
 ## Escopo do Projeto (EAP)
 
