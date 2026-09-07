@@ -3,7 +3,7 @@
 **Responsável:** Filipe (GP)
 
 ## Justificativa Metodológica
-O formato de Gráfico de Gantt foi selecionado por viabilizar a visualização clara de dependências entre os pacotes de trabalho e a sobreposição das iterações. Essa clareza visual é essencial para a Gerência de Projetos acompanhar continuamente se o projeto está *on track*, permitindo ajustes rápidos de rota em caso de gargalos.
+A representação temporal via Gráfico de Gantt foi selecionada por viabilizar a visualização clara de precedências e dependências técnicas entre pacotes de trabalho da EAP, além do paralelismo entre desenvolvedores. Essa clareza visual é essencial para que o GP identifique o caminho crítico do projeto e acompanhe se as iterações estão *on track*, permitindo ajustes rápidos de rota em caso de gargalos.
 
 ## Cronograma
 
