@@ -15,7 +15,7 @@ Veja o Documento de Visão completo em [`docs/rodada1/01-documento-visao.md`](do
 - **Linguagem:** Kotlin
 - **Build:** Gradle
 - **Containerização:** Docker / Docker Compose
-- **Banco de dados:** H2 em memória (dev local) / PostgreSQL (via Docker Compose)
+- **Banco de dados:** (PostgreSQL via Docker)
 
 ## Equipe e papéis
 
@@ -26,7 +26,7 @@ Veja o Documento de Visão completo em [`docs/rodada1/01-documento-visao.md`](do
 | Emanuel | Scrum Master / Facilitador |
 | Arben | Responsável por Configuração |
 | Enzo | Desenvolvedor |
-| (Você) | Desenvolvedora |
+| Giovana | Desenvolvedora |
 
 Detalhamento completo em [`docs/rodada1/03-papeis-responsabilidades.md`](docs/rodada1/03-papeis-responsabilidades.md).
 

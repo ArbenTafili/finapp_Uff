@@ -9,4 +9,4 @@
 | Emanuel | Scrum Master / Facilitador | Conduz cerimônias (planning, daily, review, retrospectiva); remove impedimentos |
 | Arben | Responsável por Configuração | Define estratégia de branches; organiza issues/milestones no GitHub |
 | Enzo | Desenvolvedor | Implementa o produto; participa das estimativas (Planning Poker) |
-| (Você) | Desenvolvedora | Implementa o produto; participa das estimativas (Planning Poker) |
+| Giovana | Desenvolvedora | Implementa o produto; participa das estimativas (Planning Poker) |
