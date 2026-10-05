@@ -61,10 +61,81 @@ Pré-requisitos para a execução integrada: Docker com Docker Compose. Execute 
 docker compose up --build
 ```
 
-A API fica disponível em `http://localhost:8080/api` e uma interface web simples de
-demonstração (cadastrar, listar, editar e excluir transações) em `http://localhost:8080/`.
+Esse comando sobe a aplicação e o banco PostgreSQL. A API fica disponível em
+`http://localhost:8080/api` e uma interface web simples de demonstração (cadastrar, listar,
+editar e excluir transações) em `http://localhost:8080/`. Os dados ficam no volume
+`finapp-db-data` e sobrevivem a `docker compose down`.
 
-Para desenvolvimento local sem Docker, use JDK 17 e `./gradlew bootRun`; esse perfil usa H2 em memória.
+### Desenvolvimento local
+
+Para rodar a aplicação fora do Docker basta ter qualquer Java 8 ou superior instalado, só para
+iniciar o Gradle: o JDK 17 usado pelo projeto é baixado pelo próprio Gradle na primeira
+execução (`gradle/gradle-daemon-jvm.properties`). No Windows (PowerShell ou cmd), use
+`.\gradlew.bat` no lugar de `./gradlew`.
+
+Sem Docker, com H2 em memória (os dados somem ao parar a aplicação):
+
+```bash
+./gradlew bootRun
+```
+
+Com a aplicação na máquina e o PostgreSQL do Docker, suba só o banco e ative o perfil `dev`:
+
+```bash
+docker compose up -d db
+```
+
+```bash
+./gradlew bootRun --args='--spring.profiles.active=dev'
+```
+
+### Perfis do Spring
+
+| Perfil | Quando é usado | Banco |
+|---|---|---|
+| `h2` (padrão) | `./gradlew bootRun`, sem Docker | H2 em memória |
+| `docker` | Aplicação em container (`docker compose up --build`) | PostgreSQL do Compose (host `db`) |
+| `dev` | Aplicação na máquina, com `--spring.profiles.active=dev` | PostgreSQL do Compose em `localhost:5432` |
+| `test` | `./gradlew test` (ativado automaticamente) | H2 em memória |
+
+A conexão com o PostgreSQL fica em `src/main/resources/application-docker.properties` e
+`application-dev.properties`; a do H2, em `application-h2.properties`.
+
+### Portas e variáveis de ambiente
+
+Todas as variáveis têm valor padrão, então nada precisa ser configurado. Para mudar algum
+valor, copie `.env.example` para `.env` (o `.env` não é versionado).
+
+| Variável | Padrão | Uso |
+|---|---|---|
+| `POSTGRES_DB` | `finapp` | Nome do banco |
+| `POSTGRES_USER` | `finapp` | Usuário do banco |
+| `POSTGRES_PASSWORD` | `finapp` | Senha do banco |
+| `DB_PORT` | `5432` | Porta do PostgreSQL exposta na máquina |
+| `APP_PORT` | `8080` | Porta da aplicação quando roda em container |
+
+O `docker compose` lê o `.env` sozinho. O `./gradlew bootRun` não: se você mudou algum valor
+e usa o perfil `dev`, exporte a mesma variável no terminal antes de rodar a aplicação.
+
+### Comandos úteis
+
+| Comando | O que faz |
+|---|---|
+| `docker compose ps` | Mostra o estado dos containers (o banco deve aparecer `healthy`) |
+| `docker compose logs -f` | Acompanha os logs da aplicação e do banco |
+| `docker compose down` | Para os containers e mantém os dados |
+| `docker compose down -v` | Para os containers e **apaga os dados** (volume) |
+| `docker compose exec db psql -U finapp -d finapp` | Abre o `psql` dentro do container |
+| `./gradlew test` | Roda os testes automatizados |
+
+### Problemas comuns
+
+- **Porta 5432 em uso** (PostgreSQL instalado na máquina): crie o `.env` com `DB_PORT=5433` e
+  suba os containers de novo.
+- **Porta 8080 em uso:** a aplicação em container e o `./gradlew bootRun` usam a mesma porta.
+  Pare um dos dois, ou rode com `./gradlew bootRun --args='--server.port=8081'`.
+- **`Connection refused` no perfil `dev`:** o banco ainda não está pronto ou o Docker está
+  parado; confira com `docker compose ps`.
 
 ## Controle de versões — GitHub Flow
 
