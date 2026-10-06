@@ -12,18 +12,23 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.util.Optional
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 
 class TransacaoServiceTest {
 
-    private val hoje = LocalDate.now()
+    private val hoje = LocalDate.of(2026, 9, 15)
+    private val clock = Clock.fixed(Instant.parse("2026-09-15T12:00:00Z"), ZoneOffset.UTC)
 
     private val transacaoRepository = mockk<TransacaoRepository>()
     private val categoriaService = mockk<CategoriaService>()
-    private val service = TransacaoService(transacaoRepository, categoriaService)
+    private val service = TransacaoService(transacaoRepository, categoriaService, clock)
 
     private val despesaCat = Categoria("Alimentação", TipoTransacao.DESPESA, true).also { it.id = 1L }
     private val receitaCat = Categoria("Salário", TipoTransacao.RECEITA, true).also { it.id = 2L }
@@ -90,6 +95,23 @@ class TransacaoServiceTest {
     }
 
     @Test
+    fun `criar padroniza o valor para duas casas sem alterar o montante`() {
+        preparar()
+
+        val t = service.criar(request(valor = "10.5"))
+
+        assertEquals("10.50", t.valor.toPlainString())
+    }
+
+    @Test
+    fun `descricao em branco vira nula e descricao e aparada`() {
+        preparar()
+
+        assertNull(service.criar(request(descricao = "   ")).descricao)
+        assertEquals("Mercado", service.criar(request(descricao = "  Mercado ")).descricao)
+    }
+
+    @Test
     fun `atualizar altera os campos da transacao existente`() {
         preparar()
         val existente = Transacao(BigDecimal("10.00"), TipoTransacao.DESPESA, hoje, "antiga", despesaCat)
@@ -97,7 +119,7 @@ class TransacaoServiceTest {
 
         val t = service.atualizar(5L, request(valor = "99.90", descricao = "nova"))
 
-        assertEquals(BigDecimal("99.90"), t.valor)
+        assertEquals("99.90", t.valor.toPlainString())
         assertEquals("nova", t.descricao)
     }
 
@@ -120,4 +142,13 @@ class TransacaoServiceTest {
         assertFailsWith<RecursoNaoEncontradoException> { service.excluir(7L) }
     }
 
+    @Test
+    fun `calcularSaldo usa as transacoes persistidas`() {
+        every { transacaoRepository.findAll() } returns listOf(
+            Transacao(BigDecimal("100.00"), TipoTransacao.RECEITA, hoje, null, receitaCat),
+            Transacao(BigDecimal("30.10"), TipoTransacao.DESPESA, hoje, null, despesaCat)
+        )
+
+        assertEquals("69.90", service.calcularSaldo().saldo.toPlainString())
+    }
 }

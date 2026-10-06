@@ -1,5 +1,6 @@
 package com.finapp.controller
 
+import com.finapp.dto.SaldoResponse
 import com.finapp.dto.TransacaoRequest
 import com.finapp.dto.TransacaoResponse
 import com.finapp.dto.toResponse
@@ -23,6 +24,9 @@ class TransacaoController(private val transacaoService: TransacaoService) {
     @GetMapping
     fun listar(): List<TransacaoResponse> =
         transacaoService.listar().map { it.toResponse() }
+
+    @GetMapping("/saldo")
+    fun saldo(): SaldoResponse = transacaoService.calcularSaldo()
 
     @GetMapping("/{id}")
     fun buscarPorId(@PathVariable id: Long): TransacaoResponse =
