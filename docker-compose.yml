@@ -1,20 +1,29 @@
+# Aplicação e banco (PostgreSQL) do FinApp.
+#
+#   docker compose up --build   -> sobe a aplicação e o banco
+#   docker compose up -d db     -> sobe só o banco (aplicação na máquina, com o perfil dev)
+#
+# Os valores abaixo têm padrão; para alterá-los, copie .env.example para .env.
 services:
   db:
     image: postgres:16-alpine
     container_name: finapp-db
+    restart: unless-stopped
     environment:
-      - POSTGRES_DB=finapp
-      - POSTGRES_USER=finapp
-      - POSTGRES_PASSWORD=finapp
+      POSTGRES_DB: ${POSTGRES_DB:-finapp}
+      POSTGRES_USER: ${POSTGRES_USER:-finapp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-finapp}
+      TZ: America/Sao_Paulo
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - finapp-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U finapp -d finapp"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 10s
 
   finapp:
     build: .
@@ -23,12 +32,13 @@ services:
       db:
         condition: service_healthy
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/finapp
-      - SPRING_DATASOURCE_USERNAME=finapp
-      - SPRING_DATASOURCE_PASSWORD=finapp
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-finapp}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-finapp}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-finapp}
+      TZ: America/Sao_Paulo
 
 volumes:
   finapp-db-data:
