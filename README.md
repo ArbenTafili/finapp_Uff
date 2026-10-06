@@ -97,6 +97,7 @@ docker compose up -d db
 | `docker` | Aplicação em container (`docker compose up --build`) | PostgreSQL do Compose (host `db`) |
 | `dev` | Aplicação na máquina, com `--spring.profiles.active=dev` | PostgreSQL do Compose em `localhost:5432` |
 | `test` | `./gradlew test` (ativado automaticamente) | PostgreSQL em container criado pelo Testcontainers (exige Docker em execução, não o `docker compose`) |
+| `demo` | Somado a `dev` ou `h2` (ex.: `dev,demo`) no ensaio da demo | Pré-carrega a massa base da Demo v2 se o banco estiver sem transações; ver [`docs/rodada2/05-preparacao-demo-v2.md`](docs/rodada2/05-preparacao-demo-v2.md) |
 
 A conexão com o PostgreSQL fica em `src/main/resources/application-docker.properties` e
 `application-dev.properties`; a do H2, em `application-h2.properties`.
