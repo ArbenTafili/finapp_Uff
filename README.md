@@ -101,6 +101,36 @@ docker compose up -d db
 A conexão com o PostgreSQL fica em `src/main/resources/application-docker.properties` e
 `application-dev.properties`; a do H2, em `application-h2.properties`.
 
+### Relatório mensal (RF03)
+
+`GET /api/relatorios?mes=AAAA-MM` devolve os totais do mês, o saldo e a distribuição das
+despesas por categoria. Os campos `mesAnterior` e `proximoMes` servem para navegar entre meses.
+Um mês sem transações responde 200 com totais zerados; `mes` ausente ou fora do formato
+responde 400.
+
+```bash
+curl "http://localhost:8080/api/relatorios?mes=2026-09"
+```
+
+```json
+{
+  "mes": "2026-09",
+  "mesAnterior": "2026-08",
+  "proximoMes": "2026-10",
+  "totalReceitas": 3000.00,
+  "totalDespesas": 600.00,
+  "saldo": 2400.00,
+  "despesasPorCategoria": [
+    { "categoriaId": 9, "categoria": "Educação Demo", "valor": 300.00, "percentual": 50.00 },
+    { "categoriaId": 3, "categoria": "Alimentação", "valor": 200.00, "percentual": 33.33 },
+    { "categoriaId": 5, "categoria": "Transporte", "valor": 100.00, "percentual": 16.67 }
+  ]
+}
+```
+
+O `percentual` é a participação da categoria no total de despesas do mês, arredondada a duas
+casas. Receitas entram em `totalReceitas`, mas não na distribuição.
+
 ### Schema e migrações (Flyway)
 
 O schema é versionado em `src/main/resources/db/migration` e aplicado pelo Flyway na subida da
