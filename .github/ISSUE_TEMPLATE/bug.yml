@@ -1,0 +1,33 @@
+name: Bug
+description: Registrar um defeito observado
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema e passos para reproduzir
+      description: Descreva o resultado atual e o esperado.
+    validations:
+      required: true
+  - type: input
+    id: eap
+    attributes:
+      label: Pacote EAP
+      description: Informe o pacote correspondente no Plano de Projeto.
+    validations:
+      required: true
+  - type: input
+    id: horas
+    attributes:
+      label: Horas previstas
+      description: Informe a estimativa acordada pela equipe.
+    validations:
+      required: true
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      description: Liste as verificações que demonstram a correção.
+    validations:
+      required: true
