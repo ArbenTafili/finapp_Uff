@@ -34,9 +34,9 @@ gantt
     Atualizacao de Riscos             :e2, 2026-10-05, 5d
     
     section Filipe
-    Monitoramento EVM e Burndown      :f1, 2026-10-07, 3d
-    Atualizar Cronograma e Orcamento  :f2, 2026-10-07, 3d
-    Slides da Rodada 2                :f3, 2026-10-10, 2d
+    Monitoramento EVM e Burndown      :f1, 2026-10-06, 2d
+    Atualizar Cronograma e Orcamento  :f2, 2026-10-06, 2d
+    Slides da Rodada 2                :f3, after f1, 3d
     
     section Demonstracao
     Ensaio da Demo v2                 :g1, 2026-10-11, 2d
