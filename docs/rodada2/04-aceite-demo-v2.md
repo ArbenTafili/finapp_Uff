@@ -20,7 +20,7 @@ A Demo v2 cobre a conclusão de RF01/RF02 e a entrega parcial de RF03. Interface
 
 O [backlog da Issue #24](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-backlog-rodada2/docs/rodada2/01-backlog.md) define a priorização. A persistência está no [RDT-01 canônico](../adr/RDT-01.md), com [complementação da Sara](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/adr/RDT-01.md). A regra `data <= hoje` segue o [ADR 001](../rodada1/10-decisoes-tecnicas.md).
 
-**Situação de integração:** RF03 está na main pelos PRs #36/#37. O [PR #39 da Giovana](https://github.com/ArbenTafili/finapp_Uff/pull/39) entrou na develop; os complementos de #18, #16 e #21 estão nas branches técnicas correspondentes. A versão integrada para o ensaio ainda deve receber essas entregas. As regras do [ADR 002](https://github.com/ArbenTafili/finapp_Uff/blob/develop/docs/rodada1/10-decisoes-tecnicas.md) permanecem propostas e com aceite pendente.
+**Situação de integração:** RF03 está na main pelos PRs #36/#37. As entregas de RF01/RF02, integração e testes da Giovana (#16/#17/#18/#21) foram consolidadas na main pelo [PR #43](https://github.com/ArbenTafili/finapp_Uff/pull/43), versão `c86694f`. O código está disponível para o ensaio; o aceite funcional depende dos registros de execução. O [ADR 002](../rodada1/10-decisoes-tecnicas.md) permanece com status Proposto, aguardando confirmação formal. Novas alterações documentais seguem branch criada a partir da main → PR para develop → integração posterior à main.
 
 ## 2. Preparação para execução
 
@@ -94,11 +94,11 @@ Dados adicionais para cenários específicos:
 | RF01-09 | Uma categoria ausente ou um ID de categoria inexistente. | O usuário tenta cadastrar ou editar uma transação. | A operação é rejeitada com erro compreensível e sem associação inválida no banco. |
 | RF01-10 | O cenário separado de precisão decimal em junho de 2026. | O sistema calcula os totais e o saldo daquele mês. | Receitas de R$ 10,30 e despesa de R$ 0,10 resultam em saldo exato de R$ 10,20. |
 | RF01-11 | Aplicação pronta e uma categoria válida disponível. | O usuário realiza o fluxo de cadastro de uma transação enquanto o tempo é medido. | Consegue concluir o registro em menos de 30 segundos; tempo, navegador e dados utilizados ficam registrados como evidência do RNF01. |
-| RF01-12 | Tipo RECEITA com categoria Alimentação (DESPESA), ou edição que torne tipo e categoria incompatíveis. | O usuário cadastra ou edita a transação. | HTTP 422 com mensagem clara; nenhum registro incompatível é criado ou alterado. Depende da integração da Issue #18. |
-| RF01-13 | Valor de entrada 10.999 e, separadamente, 10.5. | O usuário solicita cadastro ou edição. | 10.999 retorna HTTP 400; 10.5 é aceito como 10.50, sem arredondamento silencioso. Depende da Issue #16. |
-| RF01-14 | Apenas D1–D4 presentes na instância, sem T1/T2 ou registros dos demais cenários. | É solicitado `GET /api/transacoes/saldo`. | Totais globais de receitas 3000.00, despesas 600.00 e saldo 2400.00. Esse endpoint não é mensal e depende da Issue #16. |
-| RF01-15 | Dados válidos com descrição em branco ou com espaços nas extremidades. | O usuário cadastra a transação. | Descrição em branco resulta em null; espaços externos são removidos, preservando o texto. Depende da Issue #16. |
-| RF01-16 | JSON malformado, tipo/data inválidos ou ID não numérico na URL, em tentativas separadas. | A requisição é enviada. | HTTP 400 com resposta de erro padronizada e sem criação/alteração de dados. Depende da Issue #16. |
+| RF01-12 | Tipo RECEITA com categoria Alimentação (DESPESA), ou edição que torne tipo e categoria incompatíveis. | O usuário cadastra ou edita a transação. | HTTP 422 com mensagem clara; nenhum registro incompatível é criado ou alterado. Regra da Issue #18, integrada pelo PR #43. |
+| RF01-13 | Valor de entrada 10.999 e, separadamente, 10.5. | O usuário solicita cadastro ou edição. | 10.999 retorna HTTP 400; 10.5 é aceito como 10.50, sem arredondamento silencioso. Regra da Issue #16, integrada pelo PR #43. |
+| RF01-14 | Apenas D1–D4 presentes na instância, sem T1/T2 ou registros dos demais cenários. | É solicitado `GET /api/transacoes/saldo`. | Totais globais de receitas 3000.00, despesas 600.00 e saldo 2400.00. Esse endpoint não é mensal; foi integrado com a Issue #16 pelo PR #43. |
+| RF01-15 | Dados válidos com descrição em branco ou com espaços nas extremidades. | O usuário cadastra a transação. | Descrição em branco resulta em null; espaços externos são removidos, preservando o texto. Regra da Issue #16, integrada pelo PR #43. |
+| RF01-16 | JSON malformado, tipo/data inválidos ou ID não numérico na URL, em tentativas separadas. | A requisição é enviada. | HTTP 400 com resposta de erro padronizada e sem criação/alteração de dados. Regra da Issue #16, integrada pelo PR #43. |
 
 ### RF02 — Gerenciar Categorias
 
@@ -112,10 +112,10 @@ Dados adicionais para cenários específicos:
 | RF02-06 | Uma categoria padrão, como Transporte. | O usuário solicita sua exclusão. | A exclusão é bloqueada com mensagem clara e a categoria permanece disponível. |
 | RF02-07 | Educação Demo personalizada e vinculada à transação D4. | O usuário solicita sua exclusão. | A exclusão é bloqueada; a categoria e a transação permanecem válidas. |
 | RF02-08 | Uma categoria válida disponível. | O usuário cadastra e consulta uma transação associada a ela. | A associação é persistida e a resposta da transação identifica a categoria correta, atendendo à integração da Issue #18. |
-| RF02-09 | Educação Demo já cadastrada como DESPESA. | O usuário tenta criar ou renomear outra categoria DESPESA para o mesmo nome, inclusive com maiúsculas diferentes. | HTTP 409; nenhuma duplicação no mesmo tipo. O mesmo nome em outro tipo é permitido. Depende da integração da Issue #17. |
-| RF02-10 | Transporte é uma categoria padrão. | O usuário tenta alterar seu nome ou tipo. | HTTP 422 e os dados originais são preservados. Depende da integração da Issue #17. |
-| RF02-11 | Educação Demo é DESPESA e está vinculada a D4. | O usuário tenta mudar seu tipo para RECEITA. | HTTP 422; a categoria e a transação mantêm seus tipos originais. Depende da integração da Issue #17. |
-| RF02-12 | Instância de teste dedicada com categoria personalizada, mas sem todas as categorias padrão. | A aplicação inicia e depois é reiniciada. | As oito categorias padrão ficam disponíveis, sem duplicação por nome/tipo e sem apagar a personalizada. Depende da integração da Issue #17. |
+| RF02-09 | Educação Demo já cadastrada como DESPESA. | O usuário tenta criar ou renomear outra categoria DESPESA para o mesmo nome, inclusive com maiúsculas diferentes. | HTTP 409; nenhuma duplicação no mesmo tipo. O mesmo nome em outro tipo é permitido. Regra da Issue #17, integrada pelo PR #43. |
+| RF02-10 | Transporte é uma categoria padrão. | O usuário tenta alterar seu nome ou tipo. | HTTP 422 e os dados originais são preservados. Regra da Issue #17, integrada pelo PR #43. |
+| RF02-11 | Educação Demo é DESPESA e está vinculada a D4. | O usuário tenta mudar seu tipo para RECEITA. | HTTP 422; a categoria e a transação mantêm seus tipos originais. Regra da Issue #17, integrada pelo PR #43. |
+| RF02-12 | Instância de teste dedicada com categoria personalizada, mas sem todas as categorias padrão. | A aplicação inicia e depois é reiniciada. | As oito categorias padrão ficam disponíveis, sem duplicação por nome/tipo e sem apagar a personalizada. Regra da Issue #17, integrada pelo PR #43. |
 
 ### RF03 — Relatórios, entrega parcial
 
@@ -198,7 +198,7 @@ Se D1–D4 tiverem sido pré-carregados para agilizar a apresentação, identifi
 
 ## 7. Dependências e pendências do ensaio
 
-- **Integração de RF01/RF02:** coordenar com Arben e Giovana a integração à main de #17 → #18 → #16 → #21. O PR #39 entrou na develop; os cenários das novas regras permanecem pendentes de integração e execução na versão da demo.
+- **RF01/RF02 e testes:** entregas integradas à main pelo PR #43; executar os cenários na versão da demo e registrar os resultados. Confirmar o status formal do ADR 002 com Giovana e Enzo.
 - **RF03:** código e contrato das Issues #19/#20 já integrados; executar os cenários e registrar resultados e desempenho no ambiente da demonstração.
 - **Ambiente e schema:** validar as entregas das Issues [#14](https://github.com/ArbenTafili/finapp_Uff/issues/14) e [#15](https://github.com/ArbenTafili/finapp_Uff/issues/15), preservando os valores monetários e a execução local.
 - **Preparação e duração:** Enzo e Giovana ensaiam o roteiro na Issue #29, conferem os IDs, a massa base e o tempo de cada etapa.
