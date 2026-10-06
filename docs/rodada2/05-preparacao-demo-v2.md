@@ -78,8 +78,8 @@ O plano B com H2 deve ser informado ao Emanuel para a análise de riscos (Issue 
 ## 4. Ensaios
 
 Fazer pelo menos um ensaio completo e cronometrado seguindo o roteiro da Sara, e um ensaio do
-plano B com H2. Gravar a tela do último ensaio. Os resultados de cada cenário de aceite são
-registrados na tabela da seção 5 do roteiro; aqui ficam só os problemas de ambiente.
+plano B com H2. Gravar a tela do último ensaio. Registrar os resultados e as evidências dos
+cenários de aceite na Issue #29; usar a tabela abaixo para os ajustes de ambiente.
 
 | Data | Duração | Problemas encontrados | Ajuste feito |
 |---|---|---|---|

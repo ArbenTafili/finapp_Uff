@@ -2,9 +2,7 @@
 
 **Responsável:** Sara Marcomini (Product Owner)
 
-**Situação:** escopo revisado; integração e aceite das funcionalidades conforme o backlog.
-
-Esta revisão atualiza a seção 2 do Plano de Projeto para a rodada 2. O [documento da rodada 1](../rodada1/02-escopo-eap.md) permanece como referência histórica. O CRUD de transações e categorias da Demo v1 é o ponto de partida informado pela equipe; as entregas desta rodada dependem de validação de aceite. A distribuição revisada está detalhada no [backlog](01-backlog.md).
+Esta revisão atualiza a seção 2 do Plano de Projeto para a rodada 2, a partir do CRUD de transações e categorias da Demo v1. A distribuição das entregas está no [backlog](01-backlog.md), e a versão anterior está no [documento da rodada 1](../rodada1/02-escopo-eap.md).
 
 **Issue da revisão:** [#24 — Revisar backlog e escopo da Iteração 2](https://github.com/ArbenTafili/finapp_Uff/issues/24).
 
@@ -18,7 +16,7 @@ Para a validação da data, será adotada a regra de que a transação pode poss
 ### RF02 — Gerenciar Categorias
 Disponibilizar categorias padrão pré-carregadas e permitir que o usuário crie, edite e exclua categorias personalizadas.
 
-As regras propostas no [ADR 002 da Giovana](../rodada1/10-decisoes-tecnicas.md) detalham seed idempotente, nome único por tipo sem distinção entre maiúsculas/minúsculas, categorias padrão imutáveis e bloqueio de exclusão ou mudança de tipo de categoria vinculada. A integração exige tipo da transação igual ao da categoria. As regras e os complementos de integração/transações foram consolidados na main pelo PR #43. O aceite funcional e a aprovação formal do ADR 002, ainda Proposto, permanecem pendentes.
+As regras descritas no [ADR 002](../rodada1/10-decisoes-tecnicas.md) incluem seed idempotente, nome único por tipo sem distinção entre maiúsculas/minúsculas, categorias padrão imutáveis e bloqueio de exclusão ou mudança de tipo de categoria vinculada. O tipo da transação deve corresponder ao da categoria. Essas regras estão implementadas na main.
 
 ### RF03 — Visualizar Relatórios
 Permitir a visualização de relatórios mensais contendo total de receitas, total de despesas, distribuição de gastos por categoria e navegação entre meses.
@@ -175,7 +173,7 @@ As dependências abaixo orientam o cronograma e permitem que o Gráfico de Gantt
 
 ## Distribuição macro por Rodada
 
-Esta distribuição revisa o planejamento por rodada conforme a divisão de trabalho da equipe. Os pacotes mantêm seus IDs; sua inclusão na tabela indica planejamento, não comprovação de conclusão.
+A distribuição por rodada mantém os IDs da EAP e organiza os pacotes conforme a divisão de trabalho da equipe.
 
 | Rodada | Objetivo | Pacotes prioritários | Marco |
 |---|---|---|---|
@@ -187,17 +185,16 @@ Esta distribuição revisa o planejamento por rodada conforme a divisão de trab
 
 O início de 3.4 (RF04 — Metas), anteriormente previsto para a rodada 2, foi transferido para a rodada 3 para priorizar a conclusão de RF01/RF02 e a entrega parcial de RF03. Essa alteração reorganiza as entregas por rodada e preserva RF04 no escopo total do produto.
 
-Na rodada 2, RF03 contempla consultas e endpoint mensal com total de receitas, total de despesas, saldo e distribuição de despesas por categoria, integrados à main pelos PRs #36/#37. O endpoint também informa os meses vizinhos. A interface completa, os gráficos e a navegação visual ficam para a rodada 3. O limite de desempenho do RNF02 permanece como requisito; os testes existentes e a medição no ambiente da demo devem ter resultados registrados para o aceite.
+Na rodada 2, RF03 contempla consultas e endpoint mensal com total de receitas, total de despesas, saldo e distribuição de despesas por categoria, integrados à main pelos PRs #36/#37. O endpoint também informa os meses vizinhos. A interface completa, os gráficos e a navegação visual ficam para a rodada 3. O RNF02 mantém o limite de carregamento em menos de 3 segundos.
 
-O RNF03 recebe a redação acordada para explicitar a execução local do banco via Docker e a ausência de envio de dados a serviços externos. A escolha está no [RDT-01 canônico](../adr/RDT-01.md), Issue #13, com [complementação da Sara em branch](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/adr/RDT-01.md). A data e os aprovadores da decisão permanecem a confirmar. O [ADR 001](../rodada1/10-decisoes-tecnicas.md), relativo a `data <= hoje`, permanece independente e preservado.
+O RNF03 especifica o uso de banco local via Docker, sem envio de dados a serviços externos, conforme o [RDT-01](../adr/RDT-01.md). A regra `data <= hoje` está no [ADR 001](../rodada1/10-decisoes-tecnicas.md).
 
-### Rastreabilidade e pendências de impacto
+### Documentos e acompanhamento
 
-- **Issue de backlog e escopo:** [#24](https://github.com/ArbenTafili/finapp_Uff/issues/24), com os vínculos às tarefas técnicas apresentados no backlog.
-- **Impacto em horas, prazo detalhado e custo:** a confirmar com Filipe, considerando a transferência de metas e a formalização do RDT-01. Nenhuma nova estimativa é estabelecida nesta revisão.
-- **RDT-01:** registro inicial integrado pelo Arben na [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), com complementação da Sara em branch; confirmar data, aprovação e histórico das alternativas.
-- **Critérios de aceite e roteiro da Demo v2:** entrega da [Issue #25](https://github.com/ArbenTafili/finapp_Uff/issues/25); ensaio e preparação técnica da demonstração vinculados à [Issue #29](https://github.com/ArbenTafili/finapp_Uff/issues/29).
-- **Situação das entregas:** infraestrutura, RF03 parcial e complementos de RF01/RF02/testes integrados à main; entregas da Giovana consolidadas pelo PR #43. A situação detalhada está no backlog; a conclusão exige integração, evidências e aceite de Sara.
+- **Backlog e escopo:** [Issue #24](https://github.com/ArbenTafili/finapp_Uff/issues/24) e [backlog da rodada 2](01-backlog.md).
+- **Horas, prazo e custo:** [Monitoramento e Controle](../plano-projeto/secao-7-monitoramento-controle.md) e [Issue #23 — Cronograma e orçamento](https://github.com/ArbenTafili/finapp_Uff/issues/23).
+- **Persistência local:** [RDT-01](../adr/RDT-01.md), vinculado à [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13).
+- **Demo v2:** [critérios de aceite e roteiro](04-aceite-demo-v2.md), na [Issue #25](https://github.com/ArbenTafili/finapp_Uff/issues/25); preparação e ensaio na [Issue #29](https://github.com/ArbenTafili/finapp_Uff/issues/29).
 
 ## Relação com os demais artefatos do projeto
 
