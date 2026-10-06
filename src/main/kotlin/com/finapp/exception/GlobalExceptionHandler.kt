@@ -38,6 +38,17 @@ class GlobalExceptionHandler {
             )
         )
 
+    @ExceptionHandler(ParametroInvalidoException::class)
+    fun handleParametroInvalido(ex: ParametroInvalidoException): ResponseEntity<ErroResposta> =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+            ErroResposta(
+                status = HttpStatus.BAD_REQUEST.value(),
+                erro = "Parâmetro inválido",
+                mensagem = ex.message ?: "",
+                detalhes = mapOf(ex.parametro to (ex.message ?: "inválido"))
+            )
+        )
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidacao(ex: MethodArgumentNotValidException): ResponseEntity<ErroResposta> {
         val detalhes = ex.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "inválido") }
