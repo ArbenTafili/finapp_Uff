@@ -33,3 +33,34 @@ Optou-se pela **Opção 1 (Impedir apenas datas futuras)**.
 * A validação no backend/frontend checa apenas se `input_date <= current_date()`.
 * Redução de atrito no lançamento de despesas retroativas pelo usuário.
 * Manutenção da integridade do escopo acordado para as rodadas de entrega.
+
+---
+
+## ADR 002: Regras de Categoria × Transação (RF02 / PT12)
+
+* **Data:** 05/10/2026
+* **Status:** Proposto (aguardando revisão do Enzo)
+* **Responsável:** Giovana Nogueira
+* **Requisitos Afetados:** RF01, RF02
+
+### 1. Contexto e Problema
+O RF02 pede categorias padrão e personalizadas com CRUD, mas não define o que acontece ao excluir uma categoria usada por transações, nem se a categoria restringe o tipo da transação.
+
+### 2. Opções Avaliadas (exclusão de categoria com transações)
+1. **Bloquear a exclusão** (HTTP 422, com a quantidade de transações vinculadas na mensagem).
+2. **Exclusão em cascata:** apagaria transações e alteraria o saldo sem aviso.
+3. **Reatribuir para "Outras Despesas/Receitas":** exige escolher o destino pelo tipo e adiciona fluxo não estimado no Planning Poker.
+
+### 3. Decisão Tomada
+* **Opção 1.** Categorias padrão nunca são excluídas nem editadas. Categorias personalizadas só são excluídas sem transações vinculadas.
+* O **tipo da transação deve ser igual ao tipo da categoria** (HTTP 422 se diferente). O tipo de uma categoria com transações não pode ser alterado.
+* Nome de categoria é único por tipo, ignorando maiúsculas (HTTP 409).
+* O seed das categorias padrão é idempotente (por nome + tipo) e roda a cada inicialização.
+
+### 4. Justificativa
+* **Integridade dos cálculos (risco nº 1):** cascata ou mudança silenciosa de tipo alterariam saldos e relatórios sem o usuário perceber.
+* **Escopo:** a Opção 3 não foi estimada; pode ser reavaliada em iteração futura.
+
+### 5. Consequências
+* O usuário precisa excluir ou recategorizar as transações antes de remover uma categoria.
+* O front já filtra categorias pelo tipo escolhido, então a regra não muda o fluxo da tela.

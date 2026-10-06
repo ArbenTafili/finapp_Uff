@@ -6,22 +6,32 @@ import com.finapp.repository.CategoriaRepository
 import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Component
 
-/** Popula categorias padrão (RF02) na primeira inicialização, para a API ficar utilizável de imediato. */
+/**
+ * Popula as categorias padrão (RF02) na inicialização.
+ * Idempotente: cada categoria é criada só se ainda não existir (nome + tipo), então reiniciar a API
+ * não duplica dados e categorias padrão novas entram em bancos já populados.
+ */
 @Component
 class DataSeeder(private val categoriaRepository: CategoriaRepository) : CommandLineRunner {
 
     override fun run(vararg args: String?) {
-        if (categoriaRepository.count() > 0) return
+        CATEGORIAS_PADRAO.forEach { (nome, tipo) ->
+            if (!categoriaRepository.existsByNomeIgnoreCaseAndTipo(nome, tipo)) {
+                categoriaRepository.save(Categoria(nome = nome, tipo = tipo, ehPadrao = true))
+            }
+        }
+    }
 
-        listOf(
-            Categoria(nome = "Salário", tipo = TipoTransacao.RECEITA, ehPadrao = true),
-            Categoria(nome = "Outras Receitas", tipo = TipoTransacao.RECEITA, ehPadrao = true),
-            Categoria(nome = "Alimentação", tipo = TipoTransacao.DESPESA, ehPadrao = true),
-            Categoria(nome = "Moradia", tipo = TipoTransacao.DESPESA, ehPadrao = true),
-            Categoria(nome = "Transporte", tipo = TipoTransacao.DESPESA, ehPadrao = true),
-            Categoria(nome = "Lazer", tipo = TipoTransacao.DESPESA, ehPadrao = true),
-            Categoria(nome = "Saúde", tipo = TipoTransacao.DESPESA, ehPadrao = true),
-            Categoria(nome = "Outras Despesas", tipo = TipoTransacao.DESPESA, ehPadrao = true)
-        ).forEach(categoriaRepository::save)
+    companion object {
+        val CATEGORIAS_PADRAO: List<Pair<String, TipoTransacao>> = listOf(
+            "Salário" to TipoTransacao.RECEITA,
+            "Outras Receitas" to TipoTransacao.RECEITA,
+            "Alimentação" to TipoTransacao.DESPESA,
+            "Moradia" to TipoTransacao.DESPESA,
+            "Transporte" to TipoTransacao.DESPESA,
+            "Lazer" to TipoTransacao.DESPESA,
+            "Saúde" to TipoTransacao.DESPESA,
+            "Outras Despesas" to TipoTransacao.DESPESA
+        )
     }
 }

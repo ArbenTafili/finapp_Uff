@@ -3,6 +3,7 @@ package com.finapp.dto
 import com.finapp.model.TipoTransacao
 import com.finapp.model.Transacao
 import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.Digits
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
@@ -11,6 +12,7 @@ import java.time.LocalDate
 data class TransacaoRequest(
     @field:NotNull(message = "O valor é obrigatório")
     @field:DecimalMin(value = "0.0", inclusive = false, message = "O valor deve ser maior que zero")
+    @field:Digits(integer = 17, fraction = 2, message = "O valor deve ter no máximo 2 casas decimais")
     val valor: BigDecimal?,
 
     @field:NotNull(message = "O tipo é obrigatório (RECEITA ou DESPESA)")
@@ -42,4 +44,11 @@ fun Transacao.toResponse() = TransacaoResponse(
     data = data,
     descricao = descricao,
     categoria = categoria.toResponse()
+)
+
+/** Resumo financeiro: saldo = totalReceitas − totalDespesas (PT08). */
+data class SaldoResponse(
+    val totalReceitas: BigDecimal,
+    val totalDespesas: BigDecimal,
+    val saldo: BigDecimal
 )
