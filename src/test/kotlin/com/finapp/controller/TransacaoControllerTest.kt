@@ -1,6 +1,8 @@
 package com.finapp.controller
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.cfg.JsonNodeFeature
 import com.finapp.model.TipoTransacao
 import com.finapp.repository.CategoriaRepository
 import org.junit.jupiter.api.BeforeEach
@@ -29,6 +31,8 @@ class TransacaoControllerTest(
 ) {
 
     private val objectMapper = ObjectMapper()
+        .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+        .configure(JsonNodeFeature.STRIP_TRAILING_BIGDECIMAL_ZEROES, false)
     private var despesaId: Long = 0
     private var receitaId: Long = 0
 
@@ -91,6 +95,13 @@ class TransacaoControllerTest(
     }
 
     @Test
+    fun `deve rejeitar valor com mais de duas casas decimais em vez de arredondar`() {
+        postar(json("10.999", "DESPESA", LocalDate.now(), despesaId))
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.detalhes.valor").value("O valor deve ter no máximo 2 casas decimais"))
+    }
+
+    @Test
     fun `deve preservar centavos exatamente na resposta`() {
         postar(json("0.10", "RECEITA", LocalDate.now(), receitaId))
             .andExpect(status().isCreated)
@@ -138,4 +149,37 @@ class TransacaoControllerTest(
         ).andExpect(status().isUnprocessableEntity)
     }
 
+    @Test
+    fun `deve retornar 400 para JSON malformado ou tipo invalido`() {
+        postar("{ nao e json").andExpect(status().isBadRequest)
+        postar(json("50", "TRANSFERENCIA", LocalDate.now(), despesaId))
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.erro").value("Dados inválidos"))
+    }
+
+    @Test
+    fun `deve retornar 400 para id nao numerico e 404 para id inexistente`() {
+        mockMvc.perform(get("/api/transacoes/abc")).andExpect(status().isBadRequest)
+        mockMvc.perform(get("/api/transacoes/99999")).andExpect(status().isNotFound)
+        mockMvc.perform(delete("/api/transacoes/99999")).andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `saldo deve ser receitas menos despesas com precisao exata`() {
+        val antes = objectMapper.readTree(
+            mockMvc.perform(get("/api/transacoes/saldo")).andReturn().response.contentAsString
+        )
+        postar(json("0.10", "RECEITA", LocalDate.now(), receitaId)).andExpect(status().isCreated)
+        postar(json("0.20", "RECEITA", LocalDate.now(), receitaId)).andExpect(status().isCreated)
+        postar(json("0.05", "DESPESA", LocalDate.now(), despesaId)).andExpect(status().isCreated)
+
+        val depois = objectMapper.readTree(
+            mockMvc.perform(get("/api/transacoes/saldo")).andExpect(status().isOk).andReturn().response.contentAsString
+        )
+
+        fun dif(campo: String) = depois.get(campo).decimalValue().subtract(antes.get(campo).decimalValue())
+        kotlin.test.assertEquals("0.30", dif("totalReceitas").toPlainString())
+        kotlin.test.assertEquals("0.05", dif("totalDespesas").toPlainString())
+        kotlin.test.assertEquals("0.25", dif("saldo").toPlainString())
+    }
 }
