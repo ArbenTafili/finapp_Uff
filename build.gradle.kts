@@ -38,6 +38,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     // Testes de integração em PostgreSQL real (exige Docker em execução)
     testImplementation("org.testcontainers:postgresql")
+    testImplementation("io.mockk:mockk:1.14.5")
 }
 
 kotlin {
