@@ -2,7 +2,9 @@
 
 **Responsável:** Sara Marcomini (Product Owner)
 
-**Situação das entregas:** Planejado — validação pendente
+**Situação:** revisão documental para aceite; integração e validação funcional discriminadas por entrega.
+
+**Referência da conferência:** `main` em `14fc19a`; `develop` em `53a0fd5`.
 
 ## Objetivo e ponto de partida
 
@@ -16,9 +18,9 @@ P1 indica prioridade de conclusão na rodada 2; P2 indica a entrega parcial de r
 
 | Requisito | Entrega prevista | Prioridade | Rodada | Responsável técnico | Situação |
 |---|---|---|---|---|---|
-| RF01 — Gerenciar Transações | Concluir cadastro, listagem, edição e exclusão de receitas e despesas; validar valor maior que zero, categoria obrigatória e `data <= hoje`; conferir cálculo de saldo. | P1 | 2 | Giovana | Planejado — validação pendente |
-| RF02 — Gerenciar Categorias | Concluir categorias padrão pré-carregadas e CRUD de categorias personalizadas; impedir exclusão de categoria padrão, tratar vínculos com transações e integrar categorias aos fluxos de transação. | P1 | 2 | Giovana | Planejado — validação pendente |
-| RF03 — Relatórios (parcial) | Implementar consultas e endpoint mensal com total de receitas, total de despesas, saldo e distribuição de despesas por categoria. Validar os resultados e medir o atendimento ao RNF02. | P2 | 2 | Enzo | Planejado — validação pendente |
+| RF01 — Gerenciar Transações | Concluir CRUD; validar valor positivo com até duas casas decimais, categoria obrigatória e `data <= hoje`; conferir saldo e erros de entrada. | P1 | 2 | Giovana | Base da Demo v1 na main; complementos publicados em branch — integração e aceite pendentes. |
+| RF02 — Gerenciar Categorias | Concluir seed idempotente e CRUD de categorias personalizadas; bloquear edição/exclusão de padrão, exclusão de categoria vinculada e alteração incompatível de tipo; tratar nomes duplicados por tipo e integrar às transações. | P1 | 2 | Giovana | Regras de categorias integradas à develop pelo PR #39; integração à main e aceite pendentes. Integração com transações publicada em branch própria. |
+| RF03 — Relatórios (parcial) | Consultas e endpoint mensal com receitas, despesas, saldo e distribuição de despesas por categoria; validar resultados e medir RNF02. | P2 | 2 | Enzo | Código integrado à main pelos PRs #36/#37 — aceite funcional pendente. |
 | RF01/RF02 — Correções | Corrigir falhas identificadas no aceite ou na integração; preservar o funcionamento dos fluxos entregues. | Conforme falhas identificadas | 3 | Giovana | Planejado — validação pendente |
 | RF03 — Relatórios (conclusão) | Completar interface, gráficos e navegação entre meses, com validação integrada dos requisitos de desempenho e precisão. | Reservado para a rodada 3 | 3 | A definir pela equipe | Planejado — validação pendente |
 | RF04 — Metas de Economia | Implementar criação, acompanhamento, edição e exclusão/cancelamento de metas, progresso, estados e integração com transações. | Reservado para a rodada 3 | 3 | A definir pela equipe | Planejado — validação pendente |
@@ -39,11 +41,27 @@ Os IDs hierárquicos abaixo correspondem ao [escopo revisado](02-escopo-eap.md).
 
 Os pacotes 3.3.4–3.3.6 e a conclusão de 3.3.7 ficam para a rodada 3, junto de 3.4 (Metas) e 3.5 (Exportação CSV). A indicação de um intervalo de PTs não significa que todos estejam concluídos nesta rodada.
 
+## Situação das entregas técnicas
+
+| Issues | Entrega e evidência de configuração | Integração | Aceite funcional |
+|---|---|---|---|
+| #14/#15 | Compose, perfis e schema NUMERIC(19,2); [PR #34](https://github.com/ArbenTafili/finapp_Uff/pull/34) e [PR #35](https://github.com/ArbenTafili/finapp_Uff/pull/35). | Main; Issues fechadas. | Evidências de execução a consolidar no ensaio. |
+| #17 | Seed idempotente, nomes únicos por tipo e regras de categoria; [PR #39](https://github.com/ArbenTafili/finapp_Uff/pull/39). | Develop; Issue ainda aberta. Integração à main pendente. | Pendente. |
+| #18 | Tipo da transação compatível com a categoria; branch [feature/18-integracao-categoria-transacao](https://github.com/ArbenTafili/finapp_Uff/tree/feature/18-integracao-categoria-transacao), commit `4ff65a0`. | Publicado em branch; integração à main pendente. | Pendente. |
+| #16 | Precisão de entrada, descrição, erros e endpoint de saldo; branch [feature/16-concluir-rf01](https://github.com/ArbenTafili/finapp_Uff/tree/feature/16-concluir-rf01), commit `ada6539`. | Publicado em branch; integração à main pendente. | Pendente. |
+| #21 | Testes unitários de cálculo e precisão; branch [test/21-regras-calculo](https://github.com/ArbenTafili/finapp_Uff/tree/test/21-regras-calculo), commit `29ead08`. | Publicado em branch; integração à main pendente. | Execução e resultados a consolidar. |
+| #19/#20 | Queries e endpoint mensal; [PR #36](https://github.com/ArbenTafili/finapp_Uff/pull/36) e [PR #37](https://github.com/ArbenTafili/finapp_Uff/pull/37). | Main; Issues fechadas. | Pendente de validação por cenário. |
+| #29 | Massa D1–D4 e preparação técnica; [PR #38](https://github.com/ArbenTafili/finapp_Uff/pull/38). | Main; Issue aberta, aguardando ensaio. | Ensaio completo e contingência a executar e registrar. |
+
+O PR #39 foi integrado à `develop`, enquanto a estratégia formal da rodada prevê integração à `main`. Arben e Giovana devem coordenar essa integração antes do aceite na versão da demonstração. A sequência técnica indicada pela Giovana é #17 → #18 → #16 → #21; seus complementos não serão incorporados à main por esta revisão documental.
+
+As novas regras estão registradas no [ADR 002 da Giovana](https://github.com/ArbenTafili/finapp_Uff/blob/develop/docs/rodada1/10-decisoes-tecnicas.md), ainda com status Proposto. O ADR 001 e o RDT-01 permanecem registros independentes.
+
 ## Revisão do escopo e justificativas
 
 - **Priorização:** o início de RF04, previsto na distribuição inicial da EAP para a rodada 2, foi transferido para a rodada 3. A justificativa é concentrar a execução na conclusão de RF01/RF02 e na entrega parcial de RF03. RF04 permanece no escopo total do produto.
-- **RF03 parcial:** a rodada 2 cobre consultas e endpoint mensal. Interface completa, gráficos e navegação entre meses permanecem previstos para a rodada 3.
-- **RNF03:** adotar a redação acordada: “Os dados devem ser armazenados em banco de dados executado localmente (Docker), sem envio a serviços externos.” A escolha de PostgreSQL em Docker local está documentada no [RDT-01](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/rodada2/03-rdt-01.md), vinculado à [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13). A validação formal do registro permanece pendente.
+- **RF03 parcial:** a rodada 2 cobre consultas e endpoint mensal, já integrados à main. Os campos `mesAnterior` e `proximoMes` estão disponíveis na API; a interface completa, os gráficos e a navegação visual permanecem na rodada 3.
+- **RNF03:** adotar a redação acordada: “Os dados devem ser armazenados em banco de dados executado localmente (Docker), sem envio a serviços externos.” A escolha está no [RDT-01 canônico](../adr/RDT-01.md), integrado pelo Arben na [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13). A [complementação da Sara](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/adr/RDT-01.md) está publicada em branch; data e aprovação formal da decisão permanecem a confirmar.
 - **ADR 001:** preservar a regra `data <= hoje`, permitindo registros retroativos e bloqueando datas futuras. ADR 001 e RDT-01 são registros distintos.
 - **Impactos:** a transferência de metas altera a distribuição do trabalho entre rodadas. Impacto em horas, prazo detalhado e custo: **a confirmar com Filipe**; esta revisão não estabelece novos valores de orçamento.
 
@@ -59,7 +77,7 @@ O produto continua limitado a RF01–RF05 e RNF01–RNF05. Permanecem fora do es
 | Prioridades atualizadas | P1 para concluir RF01/RF02 e P2 para RF03 parcial. |
 | Itens fora do escopo identificados | Limites preservados e itens reservados para a rodada 3. RF04/RF05 continuam no escopo total. |
 | Mudanças relevantes possuem registro | Justificativa da transferência de metas, revisão do escopo e RDT-01 vinculado à Issue #13. |
-| Backlog coerente com as Issues da Rodada 2 | Tabela de rastreabilidade com links para as tarefas técnicas e de demonstração. |
+| Backlog coerente com as Issues da Rodada 2 | Tabelas de rastreabilidade e situação técnica, distinguindo main, develop e branches pendentes. |
 | Escopo da Demo v2 definido | RF01/RF02 e RF03 parcial; critérios e roteiro vinculados à Issue #25. |
 
 Esta tabela registra a cobertura documental. O aceite da documentação e a execução das funcionalidades são verificações distintas; publicar o backlog não comprova que todos os itens de desenvolvimento estejam concluídos.
@@ -69,7 +87,8 @@ Esta tabela registra a cobertura documental. O aceite da documentação e a exec
 | Pendência | Encaminhamento |
 |---|---|
 | Impacto em horas, prazo e custo | A confirmar com Filipe, incluindo a revisão de cronograma e o impacto associado ao RDT-01; tarefas de acompanhamento [#22](https://github.com/ArbenTafili/finapp_Uff/issues/22) e [#23](https://github.com/ArbenTafili/finapp_Uff/issues/23). |
-| Validação formal do RDT-01 | Registro redigido na entrega da Issue #13, separado do ADR 001; confirmar data, aprovação e histórico das alternativas com a equipe. |
+| Validação formal do RDT-01 | Registro inicial integrado e complementação da Sara em branch; confirmar data, aprovadores e histórico das alternativas com a equipe. |
 | Critérios Dado/Quando/Então e roteiro da Demo v2 | Documento da entrega de Sara na [Issue #25](https://github.com/ArbenTafili/finapp_Uff/issues/25), publicado na branch `feature/sara-aceite-demo-v2`; execução e ensaio pela equipe permanecem pendentes. |
 | Evidências de conclusão | Giovana e Enzo apresentam os fluxos e resultados; Sara valida o aceite antes de atualizar a situação das entregas. |
+| Integração das entregas da Giovana | Arben e Giovana devem alinhar #17/#18/#16/#21 à main, preservar as entregas do Enzo e verificar o ADR 002 proposto. |
 | Responsáveis técnicos da rodada 3 | A definir pela equipe no planejamento daquela rodada. |

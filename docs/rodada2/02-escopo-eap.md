@@ -2,7 +2,7 @@
 
 **Responsável:** Sara Marcomini (Product Owner)
 
-**Situação das entregas:** Planejado — validação pendente
+**Situação:** escopo revisado; integração e aceite das funcionalidades conforme o backlog.
 
 Esta revisão atualiza a seção 2 do Plano de Projeto para a rodada 2. O [documento da rodada 1](../rodada1/02-escopo-eap.md) permanece como referência histórica. O CRUD de transações e categorias da Demo v1 é o ponto de partida informado pela equipe; as entregas desta rodada dependem de validação de aceite. A distribuição revisada está detalhada no [backlog](01-backlog.md).
 
@@ -17,6 +17,8 @@ Para a validação da data, será adotada a regra de que a transação pode poss
 
 ### RF02 — Gerenciar Categorias
 Disponibilizar categorias padrão pré-carregadas e permitir que o usuário crie, edite e exclua categorias personalizadas.
+
+As regras propostas no [ADR 002 da Giovana](https://github.com/ArbenTafili/finapp_Uff/blob/develop/docs/rodada1/10-decisoes-tecnicas.md) detalham seed idempotente, nome único por tipo sem distinção entre maiúsculas/minúsculas, categorias padrão imutáveis e bloqueio de exclusão ou mudança de tipo de categoria vinculada. A integração exige tipo da transação igual ao da categoria. As regras de categoria estão na develop pelo PR #39; os complementos de integração/transações estão em branches próprias, pendentes de integração à main e de aceite.
 
 ### RF03 — Visualizar Relatórios
 Permitir a visualização de relatórios mensais contendo total de receitas, total de despesas, distribuição de gastos por categoria e navegação entre meses.
@@ -77,7 +79,7 @@ A EAP foi organizada de forma hierárquica para permitir que seus pacotes sejam 
 | ID EAP | Pacote de Trabalho | Descrição | Requisito relacionado |
 |---|---|---|---|
 | **2.1** | Estrutura da Aplicação Spring Boot | Organizar a aplicação Kotlin/Spring Boot em camadas coerentes de domínio, serviço, persistência e interface/API. | Base técnica |
-| **2.2** | Persistência com JPA/PostgreSQL e H2 | Utilizar Spring Data JPA com PostgreSQL no ambiente Docker executado localmente e H2 no perfil de desenvolvimento local. A escolha de PostgreSQL via Docker está documentada no [RDT-01](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/rodada2/03-rdt-01.md), vinculado à Issue #13. | RNF03 / RNF05 |
+| **2.2** | Persistência com JPA/PostgreSQL e H2 | Utilizar JPA com PostgreSQL local via Docker nos perfis docker/dev; manter H2 no perfil h2 para desenvolvimento sem Docker e contingência da demo. Testes usam PostgreSQL isolado via Testcontainers. Schema versionado por Flyway. Decisão no [RDT-01](../adr/RDT-01.md), Issue #13. | RNF03 / RNF05 |
 | **2.3** | Validação de Dados | Centralizar validações de entrada e regras de domínio utilizando os recursos de validação da aplicação. | RF01–RF05 / RNF05 |
 | **2.4** | Execução Containerizada | Manter a execução reproduzível da aplicação por Docker/Docker Compose e documentar o processo de inicialização. | Base técnica |
 | **2.5** | Estrutura de Testes Automatizados | Preparar a base de testes unitários e de integração para os serviços e regras do domínio. | RNF02 / RNF05 |
@@ -185,17 +187,17 @@ Esta distribuição revisa o planejamento por rodada conforme a divisão de trab
 
 O início de 3.4 (RF04 — Metas), anteriormente previsto para a rodada 2, foi transferido para a rodada 3 para priorizar a conclusão de RF01/RF02 e a entrega parcial de RF03. Essa alteração reorganiza as entregas por rodada e preserva RF04 no escopo total do produto.
 
-Na rodada 2, RF03 contempla consultas e endpoint mensal com total de receitas, total de despesas, saldo e distribuição de despesas por categoria. A interface completa, os gráficos e a navegação entre meses ficam para a rodada 3. O limite de desempenho do RNF02 permanece como requisito e deverá ser medido, sem presumir seu atendimento.
+Na rodada 2, RF03 contempla consultas e endpoint mensal com total de receitas, total de despesas, saldo e distribuição de despesas por categoria, integrados à main pelos PRs #36/#37. O endpoint também informa os meses vizinhos. A interface completa, os gráficos e a navegação visual ficam para a rodada 3. O limite de desempenho do RNF02 permanece como requisito; os testes existentes e a medição no ambiente da demo devem ter resultados registrados para o aceite.
 
-O RNF03 recebe a redação acordada para explicitar a execução local do banco via Docker e a ausência de envio de dados a serviços externos. Essa escolha técnica está documentada no [RDT-01](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/rodada2/03-rdt-01.md), vinculado à [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), com validação formal pendente. O [ADR 001](../rodada1/10-decisoes-tecnicas.md), relativo à validação `data <= hoje`, permanece independente e preservado.
+O RNF03 recebe a redação acordada para explicitar a execução local do banco via Docker e a ausência de envio de dados a serviços externos. A escolha está no [RDT-01 canônico](../adr/RDT-01.md), Issue #13, com [complementação da Sara em branch](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/adr/RDT-01.md). A data e os aprovadores da decisão permanecem a confirmar. O [ADR 001](../rodada1/10-decisoes-tecnicas.md), relativo a `data <= hoje`, permanece independente e preservado.
 
 ### Rastreabilidade e pendências de impacto
 
 - **Issue de backlog e escopo:** [#24](https://github.com/ArbenTafili/finapp_Uff/issues/24), com os vínculos às tarefas técnicas apresentados no backlog.
 - **Impacto em horas, prazo detalhado e custo:** a confirmar com Filipe, considerando a transferência de metas e a formalização do RDT-01. Nenhuma nova estimativa é estabelecida nesta revisão.
-- **RDT-01:** registro redigido na entrega da [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), separado do ADR 001; data, aprovação e histórico das alternativas ainda devem ser confirmados.
+- **RDT-01:** registro inicial integrado pelo Arben na [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), com complementação da Sara em branch; confirmar data, aprovação e histórico das alternativas.
 - **Critérios de aceite e roteiro da Demo v2:** entrega da [Issue #25](https://github.com/ArbenTafili/finapp_Uff/issues/25); ensaio e preparação técnica da demonstração vinculados à [Issue #29](https://github.com/ArbenTafili/finapp_Uff/issues/29).
-- **Situação das entregas:** Planejado — validação pendente. A conclusão exige evidências e aceite de Sara.
+- **Situação das entregas:** infraestrutura e RF03 parcial integrados à main; categorias atualizadas na develop e complementos de RF01/integração/testes em branches da Giovana. A situação detalhada está no backlog; a conclusão exige integração, evidências e aceite de Sara.
 
 ## Relação com os demais artefatos do projeto
 
