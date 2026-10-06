@@ -35,7 +35,7 @@ gantt
     
     section Filipe
     Monitoramento EVM e Burndown      :f1, 2026-10-07, 3d
-    Gantt Orcamento e Participacao    :f2, 2026-10-07, 3d
+    Atualizar Cronograma e Orcamento  :f2, 2026-10-07, 3d
     Slides da Rodada 2                :f3, 2026-10-10, 2d
     
     section Demonstracao
