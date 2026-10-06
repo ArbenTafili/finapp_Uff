@@ -6,6 +6,8 @@
 
 Esta revisão atualiza a seção 2 do Plano de Projeto para a rodada 2. O [documento da rodada 1](../rodada1/02-escopo-eap.md) permanece como referência histórica. O CRUD de transações e categorias da Demo v1 é o ponto de partida informado pela equipe; as entregas desta rodada dependem de validação de aceite. A distribuição revisada está detalhada no [backlog](01-backlog.md).
 
+**Issue da revisão:** [#24 — Revisar backlog e escopo da Iteração 2](https://github.com/ArbenTafili/finapp_Uff/issues/24).
+
 ## Escopo do Produto (requisitos)
 
 ### RF01 — Gerenciar Transações
@@ -75,7 +77,7 @@ A EAP foi organizada de forma hierárquica para permitir que seus pacotes sejam 
 | ID EAP | Pacote de Trabalho | Descrição | Requisito relacionado |
 |---|---|---|---|
 | **2.1** | Estrutura da Aplicação Spring Boot | Organizar a aplicação Kotlin/Spring Boot em camadas coerentes de domínio, serviço, persistência e interface/API. | Base técnica |
-| **2.2** | Persistência com JPA/PostgreSQL e H2 | Utilizar Spring Data JPA com PostgreSQL no ambiente Docker executado localmente e H2 no perfil de desenvolvimento local. A escolha de PostgreSQL via Docker será formalizada no RDT-01. | RNF03 / RNF05 |
+| **2.2** | Persistência com JPA/PostgreSQL e H2 | Utilizar Spring Data JPA com PostgreSQL no ambiente Docker executado localmente e H2 no perfil de desenvolvimento local. A escolha de PostgreSQL via Docker está documentada no [RDT-01](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/rodada2/03-rdt-01.md), vinculado à Issue #13. | RNF03 / RNF05 |
 | **2.3** | Validação de Dados | Centralizar validações de entrada e regras de domínio utilizando os recursos de validação da aplicação. | RF01–RF05 / RNF05 |
 | **2.4** | Execução Containerizada | Manter a execução reproduzível da aplicação por Docker/Docker Compose e documentar o processo de inicialização. | Base técnica |
 | **2.5** | Estrutura de Testes Automatizados | Preparar a base de testes unitários e de integração para os serviços e regras do domínio. | RNF02 / RNF05 |
@@ -185,13 +187,14 @@ O início de 3.4 (RF04 — Metas), anteriormente previsto para a rodada 2, foi t
 
 Na rodada 2, RF03 contempla consultas e endpoint mensal com total de receitas, total de despesas, saldo e distribuição de despesas por categoria. A interface completa, os gráficos e a navegação entre meses ficam para a rodada 3. O limite de desempenho do RNF02 permanece como requisito e deverá ser medido, sem presumir seu atendimento.
 
-O RNF03 recebe a redação acordada para explicitar a execução local do banco via Docker e a ausência de envio de dados a serviços externos. O registro formal dessa decisão será preparado no RDT-01, na entrega seguinte. O [ADR 001](../rodada1/10-decisoes-tecnicas.md), relativo à validação `data <= hoje`, permanece independente e preservado.
+O RNF03 recebe a redação acordada para explicitar a execução local do banco via Docker e a ausência de envio de dados a serviços externos. Essa escolha técnica está documentada no [RDT-01](https://github.com/ArbenTafili/finapp_Uff/blob/feature/sara-rdt01/docs/rodada2/03-rdt-01.md), vinculado à [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), com validação formal pendente. O [ADR 001](../rodada1/10-decisoes-tecnicas.md), relativo à validação `data <= hoje`, permanece independente e preservado.
 
-### Pendências de rastreabilidade e impacto
+### Rastreabilidade e pendências de impacto
 
-- **Número real da Issue de backlog e escopo:** a informar pelo Arben. A referência #15 da divisão de trabalho é provisória.
+- **Issue de backlog e escopo:** [#24](https://github.com/ArbenTafili/finapp_Uff/issues/24), com os vínculos às tarefas técnicas apresentados no backlog.
 - **Impacto em horas, prazo detalhado e custo:** a confirmar com Filipe, considerando a transferência de metas e a formalização do RDT-01. Nenhuma nova estimativa é estabelecida nesta revisão.
-- **RDT-01:** registro formal a preparar na entrega seguinte, separado do ADR 001. Seu número real de Issue será informado pelo Arben; a referência #4 do planejamento não deve ser tomada como número confirmado.
+- **RDT-01:** registro redigido na entrega da [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), separado do ADR 001; data, aprovação e histórico das alternativas ainda devem ser confirmados.
+- **Critérios de aceite e roteiro da Demo v2:** entrega da [Issue #25](https://github.com/ArbenTafili/finapp_Uff/issues/25); ensaio e preparação técnica da demonstração vinculados à [Issue #29](https://github.com/ArbenTafili/finapp_Uff/issues/29).
 - **Situação das entregas:** Planejado — validação pendente. A conclusão exige evidências e aceite de Sara.
 
 ## Relação com os demais artefatos do projeto
@@ -216,4 +219,4 @@ O roteiro recomendado para as demos deve priorizar um cenário único e integrad
 5. criar/acompanhar uma meta de economia;
 6. exportar as transações do período em CSV.
 
-Nas primeiras rodadas, o roteiro pode ser executado parcialmente conforme os pacotes concluídos. Na Demo v3, o objetivo é apresentar o fluxo completo RF01–RF05.
+Na Demo v2, o escopo é limitado às etapas 1–4, com RF01/RF02 e a apresentação de RF03 parcial pelas consultas e pelo endpoint mensal. Metas e exportação CSV ficam fora dessa demonstração. O roteiro de cinco minutos e os critérios de aceite estão vinculados à Issue #25; a preparação e o ensaio, à Issue #29. Na Demo v3, o objetivo é apresentar o fluxo completo RF01–RF05.
