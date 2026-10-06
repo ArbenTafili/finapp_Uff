@@ -26,7 +26,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    // Banco de dados — H2 em memória para desenvolvimento local; Postgres para o docker-compose
+    // Banco de dados — PostgreSQL na execução integrada (docker compose); H2 no perfil padrão sem Docker e nos testes
     runtimeOnly("com.h2database:h2")
     runtimeOnly("org.postgresql:postgresql")
 
@@ -43,4 +43,6 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // Garante que nenhum teste use o banco de desenvolvimento
+    systemProperty("spring.profiles.active", "test")
 }
