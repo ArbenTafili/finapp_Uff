@@ -1,0 +1,40 @@
+name: Mudança de escopo ou decisão técnica
+description: Registrar uma mudança ou decisão e seus impactos
+title: "[Mudança] "
+labels: [mudança-de-escopo]
+body:
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto e decisão proposta
+      description: Descreva a situação e a alteração necessária.
+    validations:
+      required: true
+  - type: textarea
+    id: impacto
+    attributes:
+      label: Impacto
+      description: Registre os impactos conhecidos em escopo, prazo ou arquitetura, sem estimar dados ausentes.
+    validations:
+      required: true
+  - type: input
+    id: eap
+    attributes:
+      label: Pacote EAP
+      description: Informe o pacote correspondente no Plano de Projeto.
+    validations:
+      required: true
+  - type: input
+    id: horas
+    attributes:
+      label: Horas previstas
+      description: Informe a estimativa acordada pela equipe.
+    validations:
+      required: true
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite
+      description: Liste condições verificáveis para concluir a Issue.
+    validations:
+      required: true
