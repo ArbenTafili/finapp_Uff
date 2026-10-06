@@ -49,6 +49,16 @@ class GlobalExceptionHandler {
             )
         )
 
+    @ExceptionHandler(ConflitoException::class)
+    fun handleConflito(ex: ConflitoException): ResponseEntity<ErroResposta> =
+        ResponseEntity.status(HttpStatus.CONFLICT).body(
+            ErroResposta(
+                status = HttpStatus.CONFLICT.value(),
+                erro = "Conflito",
+                mensagem = ex.message ?: ""
+            )
+        )
+
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidacao(ex: MethodArgumentNotValidException): ResponseEntity<ErroResposta> {
         val detalhes = ex.bindingResult.fieldErrors.associate { it.field to (it.defaultMessage ?: "inválido") }

@@ -12,6 +12,8 @@ import java.time.LocalDate
 interface TransacaoRepository : JpaRepository<Transacao, Long> {
     fun existsByCategoriaId(categoriaId: Long): Boolean
 
+    fun countByCategoriaId(categoriaId: Long): Long
+
     /** RF03: total por tipo no intervalo [inicio, fim), somado no banco. Tipos sem transação não aparecem. */
     @Query(
         """
