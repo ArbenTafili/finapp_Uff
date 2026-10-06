@@ -18,7 +18,7 @@ Para a validação da data, será adotada a regra de que a transação pode poss
 ### RF02 — Gerenciar Categorias
 Disponibilizar categorias padrão pré-carregadas e permitir que o usuário crie, edite e exclua categorias personalizadas.
 
-As regras propostas no [ADR 002 da Giovana](https://github.com/ArbenTafili/finapp_Uff/blob/develop/docs/rodada1/10-decisoes-tecnicas.md) detalham seed idempotente, nome único por tipo sem distinção entre maiúsculas/minúsculas, categorias padrão imutáveis e bloqueio de exclusão ou mudança de tipo de categoria vinculada. A integração exige tipo da transação igual ao da categoria. As regras de categoria estão na develop pelo PR #39; os complementos de integração/transações estão em branches próprias, pendentes de integração à main e de aceite.
+As regras propostas no [ADR 002 da Giovana](../rodada1/10-decisoes-tecnicas.md) detalham seed idempotente, nome único por tipo sem distinção entre maiúsculas/minúsculas, categorias padrão imutáveis e bloqueio de exclusão ou mudança de tipo de categoria vinculada. A integração exige tipo da transação igual ao da categoria. As regras e os complementos de integração/transações foram consolidados na main pelo PR #43. O aceite funcional e a aprovação formal do ADR 002, ainda Proposto, permanecem pendentes.
 
 ### RF03 — Visualizar Relatórios
 Permitir a visualização de relatórios mensais contendo total de receitas, total de despesas, distribuição de gastos por categoria e navegação entre meses.
@@ -197,7 +197,7 @@ O RNF03 recebe a redação acordada para explicitar a execução local do banco 
 - **Impacto em horas, prazo detalhado e custo:** a confirmar com Filipe, considerando a transferência de metas e a formalização do RDT-01. Nenhuma nova estimativa é estabelecida nesta revisão.
 - **RDT-01:** registro inicial integrado pelo Arben na [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), com complementação da Sara em branch; confirmar data, aprovação e histórico das alternativas.
 - **Critérios de aceite e roteiro da Demo v2:** entrega da [Issue #25](https://github.com/ArbenTafili/finapp_Uff/issues/25); ensaio e preparação técnica da demonstração vinculados à [Issue #29](https://github.com/ArbenTafili/finapp_Uff/issues/29).
-- **Situação das entregas:** infraestrutura e RF03 parcial integrados à main; categorias atualizadas na develop e complementos de RF01/integração/testes em branches da Giovana. A situação detalhada está no backlog; a conclusão exige integração, evidências e aceite de Sara.
+- **Situação das entregas:** infraestrutura, RF03 parcial e complementos de RF01/RF02/testes integrados à main; entregas da Giovana consolidadas pelo PR #43. A situação detalhada está no backlog; a conclusão exige integração, evidências e aceite de Sara.
 
 ## Relação com os demais artefatos do projeto
 

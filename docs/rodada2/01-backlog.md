@@ -4,7 +4,7 @@
 
 **Situação:** revisão documental para aceite; integração e validação funcional discriminadas por entrega.
 
-**Referência da conferência:** `main` em `14fc19a`; `develop` em `53a0fd5`.
+**Referência da conferência:** `main` em `c86694f`; `develop` em `6a5d558`.
 
 ## Objetivo e ponto de partida
 
@@ -18,8 +18,8 @@ P1 indica prioridade de conclusão na rodada 2; P2 indica a entrega parcial de r
 
 | Requisito | Entrega prevista | Prioridade | Rodada | Responsável técnico | Situação |
 |---|---|---|---|---|---|
-| RF01 — Gerenciar Transações | Concluir CRUD; validar valor positivo com até duas casas decimais, categoria obrigatória e `data <= hoje`; conferir saldo e erros de entrada. | P1 | 2 | Giovana | Base da Demo v1 na main; complementos publicados em branch — integração e aceite pendentes. |
-| RF02 — Gerenciar Categorias | Concluir seed idempotente e CRUD de categorias personalizadas; bloquear edição/exclusão de padrão, exclusão de categoria vinculada e alteração incompatível de tipo; tratar nomes duplicados por tipo e integrar às transações. | P1 | 2 | Giovana | Regras de categorias integradas à develop pelo PR #39; integração à main e aceite pendentes. Integração com transações publicada em branch própria. |
+| RF01 — Gerenciar Transações | Concluir CRUD; validar valor positivo com até duas casas decimais, categoria obrigatória e `data <= hoje`; conferir saldo e erros de entrada. | P1 | 2 | Giovana | Código integrado à main pelo PR #43 — aceite funcional pendente. |
+| RF02 — Gerenciar Categorias | Concluir seed idempotente e CRUD de categorias personalizadas; bloquear edição/exclusão de padrão, exclusão de categoria vinculada e alteração incompatível de tipo; tratar nomes duplicados por tipo e integrar às transações. | P1 | 2 | Giovana | Código integrado à main pelo PR #43 — aceite funcional pendente. |
 | RF03 — Relatórios (parcial) | Consultas e endpoint mensal com receitas, despesas, saldo e distribuição de despesas por categoria; validar resultados e medir RNF02. | P2 | 2 | Enzo | Código integrado à main pelos PRs #36/#37 — aceite funcional pendente. |
 | RF01/RF02 — Correções | Corrigir falhas identificadas no aceite ou na integração; preservar o funcionamento dos fluxos entregues. | Conforme falhas identificadas | 3 | Giovana | Planejado — validação pendente |
 | RF03 — Relatórios (conclusão) | Completar interface, gráficos e navegação entre meses, com validação integrada dos requisitos de desempenho e precisão. | Reservado para a rodada 3 | 3 | A definir pela equipe | Planejado — validação pendente |
@@ -46,16 +46,16 @@ Os pacotes 3.3.4–3.3.6 e a conclusão de 3.3.7 ficam para a rodada 3, junto de
 | Issues | Entrega e evidência de configuração | Integração | Aceite funcional |
 |---|---|---|---|
 | #14/#15 | Compose, perfis e schema NUMERIC(19,2); [PR #34](https://github.com/ArbenTafili/finapp_Uff/pull/34) e [PR #35](https://github.com/ArbenTafili/finapp_Uff/pull/35). | Main; Issues fechadas. | Evidências de execução a consolidar no ensaio. |
-| #17 | Seed idempotente, nomes únicos por tipo e regras de categoria; [PR #39](https://github.com/ArbenTafili/finapp_Uff/pull/39). | Develop; Issue ainda aberta. Integração à main pendente. | Pendente. |
-| #18 | Tipo da transação compatível com a categoria; branch [feature/18-integracao-categoria-transacao](https://github.com/ArbenTafili/finapp_Uff/tree/feature/18-integracao-categoria-transacao), commit `4ff65a0`. | Publicado em branch; integração à main pendente. | Pendente. |
-| #16 | Precisão de entrada, descrição, erros e endpoint de saldo; branch [feature/16-concluir-rf01](https://github.com/ArbenTafili/finapp_Uff/tree/feature/16-concluir-rf01), commit `ada6539`. | Publicado em branch; integração à main pendente. | Pendente. |
-| #21 | Testes unitários de cálculo e precisão; branch [test/21-regras-calculo](https://github.com/ArbenTafili/finapp_Uff/tree/test/21-regras-calculo), commit `29ead08`. | Publicado em branch; integração à main pendente. | Execução e resultados a consolidar. |
+| #17 | Seed idempotente, nomes únicos por tipo e regras de categoria; [PR #39](https://github.com/ArbenTafili/finapp_Uff/pull/39), seguido do [PR #43](https://github.com/ArbenTafili/finapp_Uff/pull/43). | Main; Issue fechada. | Pendente. |
+| #18 | Tipo da transação compatível com a categoria; [PR #40](https://github.com/ArbenTafili/finapp_Uff/pull/40) e consolidação no PR #43. | Main; Issue fechada. | Pendente. |
+| #16 | Precisão de entrada, descrição, erros e endpoint de saldo; [PR #41](https://github.com/ArbenTafili/finapp_Uff/pull/41), seguido do PR #43. | Main; Issue fechada. | Pendente. |
+| #21 | Testes unitários de cálculo e precisão; [PR #42](https://github.com/ArbenTafili/finapp_Uff/pull/42), seguido do PR #43. | Main; Issue fechada. | Execução e resultados a consolidar. |
 | #19/#20 | Queries e endpoint mensal; [PR #36](https://github.com/ArbenTafili/finapp_Uff/pull/36) e [PR #37](https://github.com/ArbenTafili/finapp_Uff/pull/37). | Main; Issues fechadas. | Pendente de validação por cenário. |
 | #29 | Massa D1–D4 e preparação técnica; [PR #38](https://github.com/ArbenTafili/finapp_Uff/pull/38). | Main; Issue aberta, aguardando ensaio. | Ensaio completo e contingência a executar e registrar. |
 
-O PR #39 foi integrado à `develop`, enquanto a estratégia formal da rodada prevê integração à `main`. Arben e Giovana devem coordenar essa integração antes do aceite na versão da demonstração. A sequência técnica indicada pela Giovana é #17 → #18 → #16 → #21; seus complementos não serão incorporados à main por esta revisão documental.
+As entregas da Giovana foram integradas à main pelo PR #43. A equipe informou o fluxo atual: criar a branch a partir da main, publicar commits e abrir um PR por Issue com destino à develop; a integração à main ocorre depois. Arben deve alinhar a estratégia formal e a Seção 8 do Plano, que ainda descrevem GitHub Flow, a esse fluxo operacional.
 
-As novas regras estão registradas no [ADR 002 da Giovana](https://github.com/ArbenTafili/finapp_Uff/blob/develop/docs/rodada1/10-decisoes-tecnicas.md), ainda com status Proposto. O ADR 001 e o RDT-01 permanecem registros independentes.
+As novas regras estão registradas no [ADR 002 da Giovana](../rodada1/10-decisoes-tecnicas.md), ainda com status Proposto. O ADR 001 e o RDT-01 permanecem registros independentes.
 
 ## Revisão do escopo e justificativas
 
@@ -90,5 +90,6 @@ Esta tabela registra a cobertura documental. O aceite da documentação e a exec
 | Validação formal do RDT-01 | Registro inicial integrado e complementação da Sara em branch; confirmar data, aprovadores e histórico das alternativas com a equipe. |
 | Critérios Dado/Quando/Então e roteiro da Demo v2 | Documento da entrega de Sara na [Issue #25](https://github.com/ArbenTafili/finapp_Uff/issues/25), publicado na branch `feature/sara-aceite-demo-v2`; execução e ensaio pela equipe permanecem pendentes. |
 | Evidências de conclusão | Giovana e Enzo apresentam os fluxos e resultados; Sara valida o aceite antes de atualizar a situação das entregas. |
-| Integração das entregas da Giovana | Arben e Giovana devem alinhar #17/#18/#16/#21 à main, preservar as entregas do Enzo e verificar o ADR 002 proposto. |
+| Aprovação do ADR 002 | Confirmar com Giovana e Enzo o status formal do registro, ainda identificado como Proposto. |
+| Estratégia formal de integração | Arben deve atualizar a estratégia de branches e a Seção 8 para o fluxo branch → develop → main comunicado pela equipe. |
 | Responsáveis técnicos da rodada 3 | A definir pela equipe no planejamento daquela rodada. |
