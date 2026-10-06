@@ -1,9 +1,27 @@
-# Seção 8 — Controle de Versões
+# Seção 8 — Controle de Versões e Modificações
 
-Na Rodada 2, o FinApp usa GitHub Flow. Cada trabalho parte da `main` protegida em uma branch ligada à Issue correspondente. A integração ocorre por Pull Request para `main`, após revisão, com **squash merge**. A branch `develop` da Rodada 1 fica preservada apenas como histórico.
+**Responsável:** Arben (Gerente de Configuração)
 
-Branches seguem `tipo/numero-da-issue-descricao`; commits seguem `tipo(escopo): descrição #issue`. O PR referencia a Issue com `Closes #N`. A [estratégia detalhada](../adr/estrategia-branches.md) registra as regras de revisão e proteção.
+## 1. Estratégia de Branches
+O projeto adota o modelo **GitHub Flow** adaptado para as entregas das rodadas.
+- A branch `main` é a principal, protegida, e sempre contém código integrado em estado de produção.
+- É proibido realizar commits diretamente na `main`.
+- Todo novo trabalho deve ser feito em uma *feature branch* derivada da `main`, seguindo a rigorosa nomenclatura: `feature/#numero-da-issue-descricao` (ex: `feature/#8-seed`).
+- A integração das alterações na branch principal ocorre exclusivamente via **Pull Request (PR)**, com a obrigatoriedade de revisão de código por pelo menos um membro diferente do autor da branch.
 
-As Issues registram o trabalho; os milestones agrupam `Iteração 1 / Rodada 1`, `Iteração 2 / Rodada 2` e `Iteração 3 / Rodada 3`. As labels existentes são `config`, `infra`, `feature`, `teste`, `gestão`, `demo`, `bug` e `mudança-de-escopo`. Os templates solicitam pacote EAP, horas previstas e critérios de aceite, sem preencher estimativas ausentes.
+## 2. Convenção de Commits
+Para manter o histórico legível e profissional, a equipe adota o padrão *Conventional Commits*:
+- **Formato obrigatório:** `tipo(escopo): descrição #issue`
+- **Tipos Permitidos:** `feat` (nova funcionalidade), `fix` (correção), `docs` (documentação), `test` (testes automatizados) e `config` (infraestrutura/setup).
+- **Exemplo de Commit Real:** `feat(cat): seed #8`
 
-A decisão [RDT-01](../adr/RDT-01.md), associada à [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13), documenta PostgreSQL local via Docker e a interpretação do RNF03. O registro é mantido junto às demais decisões técnicas.
+## 3. Controle de Modificações e Issues
+Todas as tarefas, *bugs* e melhorias de requisitos devem ser rastreadas como **Issues** no repositório GitHub.
+- Cada Issue criada precisa conter, obrigatoriamente: o identificador do pacote na EAP (ex: PT04), a estimativa de horas (baseada no Planning Poker) e Critérios de Aceite claros.
+- As Issues são associadas a *Milestones* (Iteração 1, Iteração 2, etc) e organizadas através de *Labels* como `feature`, `infra`, `teste`, `gestão`, `demo`, `config`, `bug` e `mudança de escopo`.
+
+## 4. Gerenciamento de Mudança de Escopo: Caso RDT-01
+Qualquer alteração arquitetural que impacte prazo ou custo deve ser tratada como Mudança de Escopo.
+- **RDT-01:** Decisão formal de migrar o banco de dados do armazenamento em memória/arquivo (H2/SQLite - RNF03) para uma instância local do **PostgreSQL** orquestrada via **Docker**.
+- **Justificativa Técnica:** Garantir paridade idêntica entre os ambientes de desenvolvimento de todos os integrantes e fornecer capacidades relacionais nativas robustas para viabilizar as queries do relatório mensal (RF03).
+- **Rastreabilidade e Impacto:** Decisão rastreada na Issue #4. Esta alteração técnica injetou aproximadamente 8 horas extras no esforço da equipe, registradas no EVM da iteração e compensadas graças à antecipação do RF03.
