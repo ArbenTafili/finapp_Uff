@@ -96,10 +96,22 @@ docker compose up -d db
 | `h2` (padrão) | `./gradlew bootRun`, sem Docker | H2 em memória |
 | `docker` | Aplicação em container (`docker compose up --build`) | PostgreSQL do Compose (host `db`) |
 | `dev` | Aplicação na máquina, com `--spring.profiles.active=dev` | PostgreSQL do Compose em `localhost:5432` |
-| `test` | `./gradlew test` (ativado automaticamente) | H2 em memória |
+| `test` | `./gradlew test` (ativado automaticamente) | PostgreSQL em container criado pelo Testcontainers (exige Docker em execução, não o `docker compose`) |
 
 A conexão com o PostgreSQL fica em `src/main/resources/application-docker.properties` e
 `application-dev.properties`; a do H2, em `application-h2.properties`.
+
+### Schema e migrações (Flyway)
+
+O schema é versionado em `src/main/resources/db/migration` e aplicado pelo Flyway na subida da
+aplicação, em qualquer perfil; o Hibernate só valida (`ddl-auto=validate`). Valores monetários
+são `NUMERIC(19,2)` no banco e `BigDecimal` no código (RNF05).
+
+- Para alterar o schema (coluna, tabela ou restrição nova em uma entidade), crie um novo
+  arquivo `V<n>__descricao.sql`. Sem ele a aplicação não sobe, porque a validação falha.
+- Nunca edite uma migração que já foi para a `main`.
+- Quem já tinha o banco da Demo v1 não precisa apagar o volume: o Flyway marca o schema
+  existente como V1 e aplica só as migrações seguintes.
 
 ### Portas e variáveis de ambiente
 
