@@ -4,22 +4,43 @@
 
 ## 1. Cronograma Atualizado (Gantt)
 
-O cronograma foi readequado para refletir a consolidação e aprovação dos módulos RF01 (Transações) e RF02 (Categorias). A entrega do RF03 (Relatório) foi puxada para frente (entrega parcial adiantada), garantindo margem de tempo para focar em Testes e Deploy na Rodada 3. O impacto de tempo causado pela adoção do Docker (RDT-01) foi contornado pelo paralelismo da equipe.
+O cronograma foi readequado para refletir a consolidação e aprovação dos módulos RF01 (Transações) e RF02 (Categorias). A entrega do RF03 (Relatório) foi puxada para frente (entrega parcial adiantada), garantindo margem de tempo para focar em Testes e Deploy na Rodada 3. O impacto de tempo causado pela adoção do Docker (RDT-01) foi contornado pelo paralelismo da equipe, conforme detalhado na distribuição de tarefas abaixo:
 
 ```mermaid
 gantt
-    title Cronograma Atualizado FinApp
+    title Cronograma Detalhado - Rodada 2
     dateFormat  YYYY-MM-DD
-    section Rodada 1
-    Planejamento & Setup       :done, a1, 2026-09-01, 14d
-    Demo v1                    :done, milestone, m1, 2026-09-14, 0d
-    section Rodada 2
-    Execução Backend & Front   :active, a2, 2026-09-15, 21d
-    Configuração & Docker (RDT-01):active, a3, 2026-09-25, 10d
-    Demo v2                    :milestone, m2, 2026-10-13, 0d
-    section Rodada 3
-    Testes & Deploy            :a4, 2026-10-14, 14d
-    Entrega Final & Demo v3    :milestone, m3, 2026-10-28, 0d
+    
+    section Giovana
+    Concluir RF01 Transacoes          :a1, 2026-09-15, 6d
+    Concluir RF02 Categorias e Seeds  :a2, after a1, 7d
+    Integracao e Testes Unitarios     :a3, after a2, 6d
+    
+    section Enzo
+    Docker e Schema RDT-01            :b1, 2026-09-15, 5d
+    RF03 Queries de Agregacao         :b2, after b1, 8d
+    RF03 Endpoint Relatorio           :b3, after b2, 6d
+    
+    section Arben
+    Estrategia Branches e Auditoria   :c1, 2026-09-15, 4d
+    Setup Issues no GitHub            :c2, after c1, 3d
+    
+    section Sara
+    Revisar Backlog e Escopo          :d1, 2026-09-15, 5d
+    Criterios de Aceite e Roteiro     :d2, 2026-09-28, 5d
+    
+    section Emanuel
+    Atas das Cerimonias               :e1, 2026-09-15, 21d
+    Atualizacao de Riscos             :e2, 2026-10-01, 4d
+    
+    section Filipe
+    Monitoramento EVM e Burndown      :f1, 2026-10-04, 2d
+    Atualizar Cronograma e Orcamento  :f2, 2026-10-04, 2d
+    Slides da Rodada 2                :f3, 2026-10-04, 2d
+    
+    section Demonstracao
+    Ensaio da Demo v2                 :g1, 2026-10-05, 1d
+    Entrega da Rodada                 :milestone, m1, 2026-10-06, 0d
 ```
 
 ## 2. Orçamento Atualizado (Pós RDT-01)
