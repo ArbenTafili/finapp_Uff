@@ -1,0 +1,36 @@
+# Blueprint do Render (https://render.com/docs/blueprint-spec): New + > Blueprint > selecione este repositório.
+# Cria o PostgreSQL e o serviço web (Docker) já ligados. Depois do primeiro deploy, abra
+# finapp > Environment e copie o valor gerado de FINAPP_ACESSO_TESTE_SENHA para a conta de teste.
+databases:
+  - name: finapp-db
+    databaseName: finapp
+    user: finapp
+    plan: free
+
+services:
+  - type: web
+    name: finapp
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/saude
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: TZ
+        value: America/Sao_Paulo
+      - key: DB_HOST
+        fromDatabase: { name: finapp-db, property: host }
+      - key: DB_PORT
+        fromDatabase: { name: finapp-db, property: port }
+      - key: POSTGRES_DB
+        fromDatabase: { name: finapp-db, property: database }
+      - key: POSTGRES_USER
+        fromDatabase: { name: finapp-db, property: user }
+      - key: POSTGRES_PASSWORD
+        fromDatabase: { name: finapp-db, property: password }
+      - key: FINAPP_ACESSO_TESTE_USUARIO
+        value: teste
+      - key: FINAPP_ACESSO_TESTE_SENHA
+        generateValue: true
+      - key: FINAPP_SEED_DEMO
+        value: "true"

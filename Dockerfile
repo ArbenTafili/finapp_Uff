@@ -15,4 +15,5 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Limita o heap à memória do container (planos gratuitos de hospedagem têm ~512 MB)
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=70", "-jar", "app.jar"]
