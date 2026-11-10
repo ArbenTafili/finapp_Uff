@@ -28,7 +28,7 @@ class AcessoTesteConfig
  * Conta de teste para a versão publicada: protege a aplicação inteira com HTTP Basic e um único par
  * usuário/senha vindo do ambiente (FINAPP_ACESSO_TESTE_USUARIO / FINAPP_ACESSO_TESTE_SENHA).
  *
- * Não é um sistema de usuários: o FinApp continua sem entidade Usuario (fora do escopo, ver ADR 002),
+ * Não é um sistema de usuários: o FinApp continua sem entidade Usuario (fora do escopo, ver ADR 001),
  * e os dados são compartilhados por quem tiver a credencial. Desligado por padrão (dev, testes e Docker local).
  */
 @Component

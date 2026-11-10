@@ -1,10 +1,10 @@
 # Publicação e conta de teste — Rodada 3
 
-O sistema publicado exige a **conta de teste** (HTTP Basic: o navegador pede usuário e senha ao abrir o endereço). Ela existe só para a banca/avaliadores acessarem a versão publicada; o FinApp continua sem cadastro de usuários (fora do escopo, ADR 002), e os dados ficam no PostgreSQL da própria hospedagem (RNF03).
+O sistema publicado exige a **conta de teste** (HTTP Basic: o navegador pede usuário e senha ao abrir o endereço). Ela existe só para a banca/avaliadores acessarem a versão publicada; o FinApp continua sem cadastro de usuários (fora do escopo, ver ADR 001 e o documento de escopo), e os dados ficam no PostgreSQL da própria hospedagem (RNF03).
 
 ## Opção A — Render (recomendada, `render.yaml` na raiz)
 
-1. Faça o merge das branches da rodada 3 na `main` (ver [ordem de merge](#ordem-de-merge)).
+1. Faça o merge das branches da rodada 3 na `main` (ver ordem de merge abaixo).
 2. No Render: **New + > Blueprint**, escolha o repositório e confirme. Serão criados o banco `finapp-db` e o serviço web `finapp`.
 3. Aguarde o build (o Dockerfile compila com Gradle; leva alguns minutos). O health check é `/api/saude`.
 4. Em **finapp > Environment**, copie o valor gerado de `FINAPP_ACESSO_TESTE_SENHA`. Usuário padrão: `teste`.
