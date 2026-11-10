@@ -50,4 +50,14 @@ interface TransacaoRepository : JpaRepository<Transacao, Long> {
         """
     )
     fun buscarParaExportacao(@Param("de") de: LocalDate?, @Param("ate") ate: LocalDate?): List<Transacao>
+
+    /** RF04: saldo (receitas − despesas) no intervalo fechado [inicio, fim], somado no banco. Sem transações, devolve 0. */
+    @Query(
+        """
+        select coalesce(sum(case when t.tipo = com.finapp.model.TipoTransacao.RECEITA then t.valor else -t.valor end), 0)
+        from Transacao t
+        where t.data >= :inicio and t.data <= :fim
+        """
+    )
+    fun saldoNoPeriodo(@Param("inicio") inicio: LocalDate, @Param("fim") fim: LocalDate): java.math.BigDecimal
 }
