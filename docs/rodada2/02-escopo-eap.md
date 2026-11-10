@@ -61,6 +61,137 @@ A ausência de autenticação é intencional nesta fase. Não será criada uma e
 
 A EAP foi organizada de forma hierárquica para permitir que seus pacotes sejam utilizados diretamente nas estimativas de Planning Poker, no cronograma, no acompanhamento de horas e nas métricas de monitoramento do projeto.
 
+### Diagramas da EAP
+
+Os diagramas representam a decomposição hierárquica do projeto. As linhas indicam a relação entre cada área e seus pacotes de trabalho, sem representar ordem de execução ou dependências do cronograma. Os IDs e nomes correspondem às tabelas detalhadas deste documento; os títulos das áreas estão abreviados nos diagramas para facilitar a leitura.
+
+#### Visão geral
+
+```mermaid
+flowchart TB
+    F["FinApp"]
+    F --- P["1. Planejamento e configuração"]
+    F --- A["2. Arquitetura e infraestrutura"]
+    F --- I["3. Implementação dos requisitos"]
+    F --- Q["4. Qualidade e demonstrações"]
+
+    I --- T["3.1 RF01: Transações"]
+    I --- C["3.2 RF02: Categorias"]
+    I --- R["3.3 RF03: Relatórios"]
+    I --- M["3.4 RF04: Metas"]
+    I --- E["3.5 RF05: Exportação"]
+```
+
+#### 1. Planejamento, configuração e baseline
+
+```mermaid
+flowchart LR
+    P["1. Planejamento e configuração"]
+    P --- P11["1.1 Configuração do Repositório e CI/CD"]
+    P --- P12["1.2 Refinamento do Backlog e User Stories"]
+    P --- P13["1.3 Planejamento da Rodada e Facilitação"]
+    P --- P14["1.4 Estruturação de Classes e Entidades"]
+    P --- P15["1.5 Implementação da Lógica de Datas e Regras"]
+    P --- P16["1.6 Gestão de Baseline e Documentação de GP"]
+```
+
+#### 2. Arquitetura e infraestrutura
+
+```mermaid
+flowchart LR
+    A["2. Arquitetura e infraestrutura"]
+    A --- A21["2.1 Estrutura da Aplicação Spring Boot"]
+    A --- A22["2.2 Persistência com JPA/PostgreSQL e H2"]
+    A --- A23["2.3 Validação de Dados"]
+    A --- A24["2.4 Execução Containerizada"]
+    A --- A25["2.5 Estrutura de Testes Automatizados"]
+```
+
+#### 3.1 RF01 — Gerenciar Transações
+
+```mermaid
+flowchart LR
+    T["3.1 RF01: Transações"]
+    T --- T311["3.1.1 Persistência e Serviço de Transações"]
+    T --- T312["3.1.2 Cadastro de Transações"]
+    T --- T313["3.1.3 Validações de Transação"]
+    T --- T314["3.1.4 Listagem de Transações"]
+    T --- T315["3.1.5 Edição de Transações"]
+    T --- T316["3.1.6 Exclusão de Transações"]
+    T --- T317["3.1.7 Cálculo de Saldo"]
+```
+
+#### 3.2 RF02 — Gerenciar Categorias
+
+```mermaid
+flowchart LR
+    C["3.2 RF02: Categorias"]
+    C --- C321["3.2.1 Persistência e Serviço de Categorias"]
+    C --- C322["3.2.2 Categorias Padrão"]
+    C --- C323["3.2.3 Cadastro de Categoria Personalizada"]
+    C --- C324["3.2.4 Edição de Categoria"]
+    C --- C325["3.2.5 Exclusão de Categoria"]
+    C --- C326["3.2.6 Integração Categoria x Transação"]
+```
+
+#### 3.3 RF03 — Visualizar Relatórios
+
+```mermaid
+flowchart LR
+    R["3.3 RF03: Relatórios"]
+    R --- R331["3.3.1 Consulta Mensal de Transações"]
+    R --- R332["3.3.2 Totalização de Receitas e Despesas"]
+    R --- R333["3.3.3 Agrupamento por Categoria"]
+    R --- R334["3.3.4 Visualização do Relatório"]
+    R --- R335["3.3.5 Gráfico por Categoria"]
+    R --- R336["3.3.6 Navegação entre Meses"]
+    R --- R337["3.3.7 Otimização de Relatórios"]
+```
+
+#### 3.4 RF04 — Gerenciar Metas de Economia
+
+```mermaid
+flowchart LR
+    M["3.4 RF04: Metas de Economia"]
+    M --- M341["3.4.1 Persistência e Serviço de Metas"]
+    M --- M342["3.4.2 Cadastro de Metas"]
+    M --- M343["3.4.3 Listagem de Metas"]
+    M --- M344["3.4.4 Edição de Metas"]
+    M --- M345["3.4.5 Exclusão/Cancelamento de Metas"]
+    M --- M346["3.4.6 Cálculo de Progresso"]
+    M --- M347["3.4.7 Barra de Progresso"]
+    M --- M348["3.4.8 Controle de Status"]
+    M --- M349["3.4.9 Integração Transações x Metas"]
+```
+
+#### 3.5 RF05 — Exportar Dados
+
+```mermaid
+flowchart LR
+    E["3.5 RF05: Exportação"]
+    E --- E351["3.5.1 Seleção de Período"]
+    E --- E352["3.5.2 Consulta de Dados para Exportação"]
+    E --- E353["3.5.3 Geração de CSV"]
+    E --- E354["3.5.4 Disponibilização do Arquivo"]
+    E --- E355["3.5.5 Validação do CSV"]
+```
+
+#### 4. Qualidade, integração e demonstrações
+
+```mermaid
+flowchart LR
+    Q["4. Qualidade e demonstrações"]
+    Q --- Q41["4.1 Testes das Regras Financeiras"]
+    Q --- Q42["4.2 Testes de CRUD e Integração"]
+    Q --- Q43["4.3 Testes de Relatórios"]
+    Q --- Q44["4.4 Testes de Exportação"]
+    Q --- Q45["4.5 Validação de Usabilidade"]
+    Q --- Q46["4.6 Validação de Compatibilidade"]
+    Q --- Q47["4.7 Integração da Demo v1"]
+    Q --- Q48["4.8 Integração da Demo v2"]
+    Q --- Q49["4.9 Estabilização e Demo v3"]
+```
+
 ### 1. Planejamento, configuração e baseline da Rodada 1
 
 | ID EAP | Pacote de Trabalho | Descrição | Requisito relacionado |
