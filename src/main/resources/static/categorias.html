@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinApp - Categorias</title>
+<style>
+  :root {
+    --bg: #eef1f6; --surface: #fff; --border: #e5e8ef; --text: #1c2333; --text-muted: #6b7280;
+    --primary: #4f5fed; --primary-dark: #3c4ad1; --primary-soft: #eef0ff;
+    --receita: #17a672; --receita-soft: #e7f8f1; --despesa: #e0473a; --despesa-soft: #fdecea;
+    --aviso: #b7791f; --aviso-soft: #fdf3dc;
+    --radius: 14px; --shadow: 0 1px 2px rgba(20,24,40,.04), 0 8px 24px rgba(20,24,40,.06);
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', -apple-system, Roboto, Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; background: var(--bg); color: var(--text); }
+  header.app-header { display: flex; align-items: center; gap: .9rem; margin-bottom: 1.75rem; }
+  .logo { width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #7c8cff); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(79,95,237,.35); }
+  .logo svg { width: 24px; height: 24px; }
+  h1 { font-size: 1.5rem; margin: 0; letter-spacing: -.02em; }
+  p.subtitle { color: var(--text-muted); margin: .15rem 0 0; font-size: .92rem; }
+  .header-link { margin-left: auto; color: var(--primary-dark); font-weight: 600; font-size: .9rem; text-decoration: none; }
+  .header-link:hover { text-decoration: underline; }
+  .card { background: var(--surface); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+  .card h2 { font-size: 1.05rem; margin: 0 0 1.1rem; }
+  form { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; }
+  label { display: block; font-size: .78rem; font-weight: 600; margin-bottom: .35rem; color: var(--text-muted); }
+  input { width: 100%; padding: .6rem .7rem; border: 1.5px solid var(--border); border-radius: 9px; font-size: .92rem; color: var(--text); background: #fff; }
+  input:focus { outline: none; border-color: var(--primary); }
+  .valor-wrap { position: relative; }
+  .valor-wrap .prefix { position: absolute; left: .7rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: .9rem; pointer-events: none; }
+  .valor-wrap input { padding-left: 2.1rem; }
+  .actions { grid-column: 1 / -1; display: flex; gap: .6rem; }
+  button { cursor: pointer; border: none; border-radius: 9px; padding: .65rem 1.3rem; font-size: .88rem; font-weight: 600; }
+  button.primary { background: var(--primary); color: #fff; }
+  button.primary:hover { filter: brightness(1.08); }
+  button.secondary { background: #f1f2f6; color: var(--text-muted); }
+  button.secondary:hover { background: #e6e8ee; }
+  button.danger { background: var(--despesa-soft); color: var(--despesa); }
+  button.small { padding: .4rem .8rem; font-size: .8rem; }
+  .meta { border: 1.5px solid var(--border); border-radius: 12px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  .meta:last-child { margin-bottom: 0; }
+  .meta-topo { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+  .meta-nome { font-weight: 700; font-size: 1rem; }
+  .pill { display: inline-flex; align-items: center; padding: .25rem .65rem; border-radius: 999px; font-size: .74rem; font-weight: 700; }
+  .pill.EM_ANDAMENTO { background: var(--primary-soft); color: var(--primary-dark); }
+  .pill.CONCLUIDA { background: var(--receita-soft); color: var(--receita); }
+  .pill.VENCIDA { background: var(--despesa-soft); color: var(--despesa); }
+  .pill.CANCELADA { background: #eceef3; color: var(--text-muted); }
+  .barra { height: 14px; background: #f1f2f6; border-radius: 999px; overflow: hidden; margin: .9rem 0 .5rem; }
+  .barra > div { height: 100%; border-radius: 999px; background: var(--primary); transition: width .4s ease; }
+  .barra > div.CONCLUIDA { background: var(--receita); }
+  .barra > div.VENCIDA { background: var(--despesa); }
+  .barra > div.CANCELADA { background: #b8bdca; }
+  .meta-info { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-size: .85rem; color: var(--text-muted); }
+  .meta-info strong { color: var(--text); font-variant-numeric: tabular-nums; }
+  .meta-acoes { display: flex; gap: .5rem; margin-top: .9rem; }
+  .empty { text-align: center; padding: 2.5rem 1rem; color: var(--text-muted); font-size: .9rem; }
+  .nota { font-size: .8rem; color: var(--text-muted); margin: 0 0 1rem; }
+  #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(20px); background: #1c2333; color: #fff; padding: .75rem 1.3rem; border-radius: 10px; font-size: .88rem; opacity: 0; pointer-events: none; transition: opacity .2s ease, transform .2s ease; z-index: 10; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { background: #3a1a17; }
+  #toast.ok { background: #15342a; }
+  @media (max-width: 720px) { form { grid-template-columns: 1fr; } }
+  select { width: 100%; padding: .6rem .7rem; border: 1.5px solid var(--border); border-radius: 9px; font-size: .92rem; background: #fff; color: var(--text); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: .7rem .6rem; font-size: .9rem; }
+  thead th { color: var(--text-muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1.5px solid var(--border); }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  td.acoes { text-align: right; white-space: nowrap; }
+  .pill.RECEITA { background: var(--receita-soft); color: var(--receita); }
+  .pill.DESPESA { background: var(--despesa-soft); color: var(--despesa); }
+  .pill.PADRAO { background: #eceef3; color: var(--text-muted); margin-left: .4rem; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2.5"></rect><path d="M2 10h20"></path><circle cx="17" cy="15" r="1.4" fill="#fff" stroke="none"></circle></svg>
+  </div>
+  <div>
+    <h1>Categorias</h1>
+    <p class="subtitle">Use as categorias padrão ou crie as suas</p>
+  </div>
+  <a class="header-link" href="/">← Transações</a>
+</header>
+
+<div class="card">
+  <h2 id="form-title">Nova categoria</h2>
+  <form id="form-categoria">
+    <input type="hidden" id="categoria-id">
+    <div>
+      <label for="nome">Nome</label>
+      <input type="text" id="nome" maxlength="100" placeholder="Ex: Educação" required>
+    </div>
+    <div>
+      <label for="tipo">Tipo</label>
+      <select id="tipo"><option value="DESPESA">Despesa</option><option value="RECEITA">Receita</option></select>
+    </div>
+    <div class="actions">
+      <button type="submit" class="primary" id="btn-salvar">Criar categoria</button>
+      <button type="button" class="secondary" id="btn-cancelar-edicao" style="display:none">Cancelar edição</button>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Categorias cadastradas</h2>
+  <p class="nota">Categorias padrão não podem ser editadas nem excluídas. Categorias com transações não podem ser excluídas nem trocar de tipo.</p>
+  <table>
+    <thead><tr><th>Nome</th><th>Tipo</th><th></th></tr></thead>
+    <tbody id="lista"></tbody>
+  </table>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = '/api';
+const form = document.getElementById('form-categoria');
+const campoId = document.getElementById('categoria-id');
+const campoNome = document.getElementById('nome');
+const campoTipo = document.getElementById('tipo');
+const btnCancelarEdicao = document.getElementById('btn-cancelar-edicao');
+let categorias = [];
+let toastTimer = null;
+
+const esc = t => String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function toast(msg, tipo) {
+  const el = document.getElementById('toast');
+  clearTimeout(toastTimer);
+  el.textContent = msg;
+  el.className = `show ${tipo || ''}`;
+  toastTimer = setTimeout(() => { el.className = ''; }, 3500);
+}
+
+async function carregar() {
+  categorias = await (await fetch(`${API}/categorias`)).json();
+  categorias.sort((a, b) => a.tipo.localeCompare(b.tipo) || a.nome.localeCompare(b.nome, 'pt-BR'));
+  document.getElementById('lista').innerHTML = categorias.map(c => `
+    <tr>
+      <td>${esc(c.nome)}${c.ehPadrao ? '<span class="pill PADRAO">padrão</span>' : ''}</td>
+      <td><span class="pill ${c.tipo}">${c.tipo === 'RECEITA' ? 'Receita' : 'Despesa'}</span></td>
+      <td class="acoes">${c.ehPadrao ? '' : `
+        <button class="secondary small" data-acao="editar" data-id="${c.id}">Editar</button>
+        <button class="danger small" data-acao="excluir" data-id="${c.id}">Excluir</button>`}</td>
+    </tr>`).join('');
+}
+
+function limpar() {
+  form.reset();
+  campoId.value = '';
+  document.getElementById('form-title').textContent = 'Nova categoria';
+  document.getElementById('btn-salvar').textContent = 'Criar categoria';
+  btnCancelarEdicao.style.display = 'none';
+}
+
+async function chamar(url, opcoes, sucesso) {
+  const resp = await fetch(url, opcoes);
+  if (resp.ok) { toast(sucesso, 'ok'); await carregar(); return true; }
+  const erro = await resp.json().catch(() => null);
+  const detalhe = erro?.detalhes ? Object.values(erro.detalhes).join('; ') : '';
+  toast(detalhe || erro?.mensagem || 'Não foi possível concluir a operação.', 'error');
+  return false;
+}
+
+form.addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const id = campoId.value;
+  const ok = await chamar(id ? `${API}/categorias/${id}` : `${API}/categorias`,
+    { method: id ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome: campoNome.value, tipo: campoTipo.value }) },
+    id ? 'Categoria atualizada.' : 'Categoria criada.');
+  if (ok) limpar();
+});
+
+btnCancelarEdicao.addEventListener('click', limpar);
+
+document.getElementById('lista').addEventListener('click', async ev => {
+  const btn = ev.target.closest('button[data-acao]');
+  if (!btn) return;
+  const c = categorias.find(x => String(x.id) === btn.dataset.id);
+  if (btn.dataset.acao === 'editar') {
+    campoId.value = c.id; campoNome.value = c.nome; campoTipo.value = c.tipo;
+    document.getElementById('form-title').textContent = 'Editar categoria';
+    document.getElementById('btn-salvar').textContent = 'Salvar edição';
+    btnCancelarEdicao.style.display = 'inline-block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (confirm(`Excluir a categoria "${c.nome}"?`)) {
+    await chamar(`${API}/categorias/${c.id}`, { method: 'DELETE' }, 'Categoria excluída.');
+  }
+});
+
+carregar();
+</script>
+</body>
+</html>
