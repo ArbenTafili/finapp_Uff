@@ -300,6 +300,8 @@
   }
   .toolbar input[type="text"] { flex: 1; min-width: 180px; }
   .toolbar select { width: auto; min-width: 140px; }
+  .toolbar input[type="date"] { width: auto; }
+  .inline-label { align-self: center; margin: 0; }
   .toolbar button.secondary {
     display: inline-flex;
     align-items: center;
@@ -466,6 +468,10 @@
       <option value="RECEITA">Receitas</option>
       <option value="DESPESA">Despesas</option>
     </select>
+    <label class="inline-label" for="exp-de">De</label>
+    <input type="date" id="exp-de" title="Data inicial da exportação (vazio = desde o início)">
+    <label class="inline-label" for="exp-ate">até</label>
+    <input type="date" id="exp-ate" title="Data final da exportação (vazio = até hoje)">
     <button type="button" class="secondary" id="btn-exportar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 19h16"></path></svg>
       Exportar CSV
@@ -702,38 +708,35 @@ function renderizarTransacoes(transacoes) {
     });
 }
 
-function exportarCsv() {
-  const transacoes = transacoesFiltradasParaTabela();
-  if (transacoes.length === 0) {
-    mostrarToast('Não há transações para exportar neste filtro.', 'error');
+// RF05: o CSV é gerado no servidor (GET /api/transacoes/exportar?de=&ate=) para o período escolhido.
+async function exportarCsv() {
+  const de = document.getElementById('exp-de').value;
+  const ate = document.getElementById('exp-ate').value;
+  if (de && ate && de > ate) {
+    mostrarToast('A data inicial não pode ser posterior à data final.', 'error');
     return;
   }
+  const params = new URLSearchParams();
+  if (de) params.set('de', de);
+  if (ate) params.set('ate', ate);
 
-  const linhas = [['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor'].join(';')];
-  transacoes
-    .slice()
-    .sort((a, b) => a.data.localeCompare(b.data))
-    .forEach(t => {
-      linhas.push([
-        t.data.split('-').reverse().join('/'),
-        t.tipo === 'RECEITA' ? 'Receita' : 'Despesa',
-        t.categoria.nome,
-        (t.descricao || '').replace(/;/g, ','),
-        Number(t.valor).toFixed(2).replace('.', ',')
-      ].join(';'));
-    });
-
-  const csv = '﻿' + linhas.join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const resp = await fetch(`${API}/transacoes/exportar?${params}`);
+  if (!resp.ok) {
+    const erro = await resp.json().catch(() => null);
+    mostrarToast(erro?.mensagem || 'Erro ao exportar transações.', 'error');
+    return;
+  }
+  const blob = await resp.blob();
+  const nome = (resp.headers.get('Content-Disposition') || '').match(/filename="?([^";]+)"?/)?.[1] || 'finapp-transacoes.csv';
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `finapp-transacoes-${periodoAtual}.csv`;
+  a.download = nome;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  mostrarToast(`${transacoes.length} transação(ões) exportada(s).`, 'ok');
+  mostrarToast('Exportação concluída.', 'ok');
 }
 
 function limparFormulario() {
