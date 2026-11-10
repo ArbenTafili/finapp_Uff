@@ -8,6 +8,18 @@ Engenharia de Software (ES - TCC00225) e Gerência de Projeto e Manutenção de 
 O FinApp permite que o usuário registre transações (receitas e despesas), organize-as em categorias,
 acompanhe metas de economia e visualize relatórios de seus gastos.
 
+### Funcionalidades (RF01–RF05)
+
+| Requisito | O que faz | Onde |
+|---|---|---|
+| RF01 Transações | CRUD de receitas e despesas com validações (valor > 0, 2 casas, data ≤ hoje) e saldo | `/` |
+| RF02 Categorias | Categorias padrão e personalizadas, com regras de exclusão e tipo | `/categorias.html` |
+| RF03 Relatórios | Totais, saldo e despesas por categoria (rosca e barras) com navegação entre meses | `/` · `GET /api/relatorios?mes=AAAA-MM` |
+| RF04 Metas | Metas de economia com valor alvo, prazo, progresso calculado a partir das transações e status | `/metas.html` · `/api/metas` |
+| RF05 Exportação | CSV das transações por período (abre direto no Excel pt-BR) | `/` · `GET /api/transacoes/exportar?de=&ate=` |
+
+Documentos da entrega final: [`docs/rodada3/`](docs/rodada3/). Publicação e conta de teste: [`docs/rodada3/deploy-conta-teste.md`](docs/rodada3/deploy-conta-teste.md).
+
 Veja o [Documento de Visão](docs/visao/README.md) e o [Plano de Projeto](docs/plano-projeto/README.md).
 
 ## Stack técnica

@@ -52,6 +52,8 @@
     box-shadow: 0 4px 14px rgba(79, 95, 237, 0.35);
   }
   .logo svg { width: 24px; height: 24px; }
+  .header-link { margin-left: auto; color: var(--primary-dark); font-weight: 600; font-size: .9rem; text-decoration: none; }
+  .header-link:hover { text-decoration: underline; }
 
   h1 { font-size: 1.5rem; margin: 0; letter-spacing: -.02em; }
   p.subtitle { color: var(--text-muted); margin: .15rem 0 0; font-size: .92rem; }
@@ -82,6 +84,15 @@
   }
   .icon-btn.nav:hover:not(:disabled) { background: #f1f2f6; border-color: #d7dbe6; }
   .icon-btn.nav:disabled { opacity: .35; cursor: not-allowed; }
+
+  .period-label { min-width: 160px; text-align: center; font-weight: 700; font-size: .95rem; }
+  button.small { padding: .4rem .8rem; font-size: .8rem; }
+  .chart-layout { display: grid; grid-template-columns: 180px 1fr; gap: 1.5rem; align-items: center; }
+  #donut { width: 180px; height: 180px; }
+  #donut circle.fatia { fill: none; stroke-width: 22; }
+  #donut text { font-size: 9px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+  .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .4rem; vertical-align: baseline; }
+  .chart-pct { color: var(--text-muted); font-weight: 500; font-size: .78rem; }
 
   .summary {
     display: grid;
@@ -260,7 +271,7 @@
   .chart-subtitle { color: var(--text-muted); font-size: .85rem; margin: -.6rem 0 1.1rem; }
   .chart-row {
     display: grid;
-    grid-template-columns: 130px 1fr 92px;
+    grid-template-columns: 150px 1fr 150px;
     align-items: center;
     gap: .75rem;
     margin-bottom: .6rem;
@@ -275,13 +286,12 @@
   }
   .chart-bar-track {
     height: 20px;
-    background: var(--despesa-soft);
+    background: #f1f2f6;
     border-radius: 4px;
     overflow: hidden;
   }
   .chart-bar-fill {
     height: 100%;
-    background: var(--despesa);
     border-radius: 0 4px 4px 0;
     transition: width .4s ease;
   }
@@ -300,6 +310,8 @@
   }
   .toolbar input[type="text"] { flex: 1; min-width: 180px; }
   .toolbar select { width: auto; min-width: 140px; }
+  .toolbar input[type="date"] { width: auto; }
+  .inline-label { align-self: center; margin: 0; }
   .toolbar button.secondary {
     display: inline-flex;
     align-items: center;
@@ -338,6 +350,9 @@
 
   @media (max-width: 720px) {
     .summary { grid-template-columns: 1fr; }
+    .chart-layout { grid-template-columns: 1fr; justify-items: center; }
+    #chart-container { width: 100%; }
+    .chart-row { grid-template-columns: 110px 1fr 110px; }
     form { grid-template-columns: 1fr 1fr; }
     thead th:nth-child(4), td.descricao { display: none; }
   }
@@ -357,18 +372,20 @@
     <h1>FinApp</h1>
     <p class="subtitle">Controle de receitas e despesas — cadastre, edite e acompanhe suas transações</p>
   </div>
+  <a class="header-link" href="metas.html">Metas de economia →</a>
 </header>
 
 <div class="section-header">
   <h2>Resumo financeiro</h2>
   <div class="period-nav">
-    <button type="button" class="icon-btn nav" id="periodo-anterior" title="Período anterior">
+    <button type="button" class="icon-btn nav" id="periodo-anterior" title="Mês anterior">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
     </button>
-    <select id="filtro-periodo"></select>
-    <button type="button" class="icon-btn nav" id="periodo-proximo" title="Próximo período">
+    <span class="period-label" id="rotulo-periodo" aria-live="polite"></span>
+    <button type="button" class="icon-btn nav" id="periodo-proximo" title="Próximo mês">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
     </button>
+    <button type="button" class="secondary small" id="periodo-hoje">Mês atual</button>
   </div>
 </div>
 
@@ -402,14 +419,17 @@
   </div>
 </section>
 
-<div class="card">
+<div class="card" id="card-relatorio">
   <div class="card-title">
     <h2>Despesas por categoria</h2>
   </div>
   <p class="chart-subtitle" id="chart-subtitle" style="display:none"></p>
-  <div id="chart-container"></div>
+  <div class="chart-layout" id="chart-layout">
+    <svg id="donut" viewBox="0 0 120 120" role="img" aria-label="Proporção das despesas por categoria"></svg>
+    <div id="chart-container"></div>
+  </div>
   <div id="chart-empty" class="empty compact" style="display:none">
-    <p>Nenhuma despesa no período selecionado.</p>
+    <p>Nenhuma despesa no mês selecionado.</p>
   </div>
 </div>
 
@@ -428,7 +448,7 @@
     </div>
 
     <div>
-      <label for="categoria">Categoria</label>
+      <label for="categoria">Categoria · <a href="categorias.html">gerenciar</a></label>
       <select id="categoria" required></select>
     </div>
     <div>
@@ -466,6 +486,10 @@
       <option value="RECEITA">Receitas</option>
       <option value="DESPESA">Despesas</option>
     </select>
+    <label class="inline-label" for="exp-de">De</label>
+    <input type="date" id="exp-de" title="Data inicial da exportação (vazio = desde o início)">
+    <label class="inline-label" for="exp-ate">até</label>
+    <input type="date" id="exp-ate" title="Data final da exportação (vazio = até hoje)">
     <button type="button" class="secondary" id="btn-exportar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 19h16"></path></svg>
       Exportar CSV
@@ -513,7 +537,10 @@ const contador = document.getElementById('contador');
 const toast = document.getElementById('toast');
 const toastMsg = document.getElementById('toast-msg');
 
-const seletorPeriodo = document.getElementById('filtro-periodo');
+const rotuloPeriodoEl = document.getElementById('rotulo-periodo');
+const btnPeriodoHoje = document.getElementById('periodo-hoje');
+const donut = document.getElementById('donut');
+const chartLayout = document.getElementById('chart-layout');
 const btnPeriodoAnterior = document.getElementById('periodo-anterior');
 const btnPeriodoProximo = document.getElementById('periodo-proximo');
 const chartContainer = document.getElementById('chart-container');
@@ -525,7 +552,9 @@ const btnExportar = document.getElementById('btn-exportar');
 
 let categorias = [];
 let todasTransacoes = [];
-let periodoAtual = 'todos';
+let periodoAtual = mesCorrente();
+let relatorio = null;
+let relatorioSeq = 0;
 let toastTimer = null;
 
 const NOMES_MES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
@@ -566,43 +595,57 @@ async function carregarCategorias() {
 function renderizarOpcoesCategoria() {
   const filtradas = categorias.filter(c => c.tipo === tipoSelecionado());
   campoCategoria.innerHTML = filtradas
-    .map(c => `<option value="${c.id}">${c.nome}</option>`)
+    .map(c => `<option value="${c.id}">${esc(c.nome)}</option>`)
     .join('');
 }
 
 async function carregarTransacoes() {
   const resp = await fetch(`${API}/transacoes`);
   todasTransacoes = await resp.json();
-  popularSeletorPeriodo();
-  atualizarTudo();
+  if (!relatorio) periodoAtual = escolherMesInicial();
+  await carregarRelatorio(periodoAtual);
 }
 
-function periodosDisponiveis() {
-  const chaves = new Set(todasTransacoes.map(t => t.data.slice(0, 7)));
-  return [...chaves].sort().reverse();
+function mesCorrente() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
-function popularSeletorPeriodo() {
-  const periodos = periodosDisponiveis();
-  const selecaoValida = periodoAtual === 'todos' || periodos.includes(periodoAtual);
-  if (!selecaoValida) periodoAtual = 'todos';
-
-  const opcoes = ['<option value="todos">Todos os períodos</option>']
-    .concat(periodos.map(p => `<option value="${p}">${rotuloPeriodoCapitalizado(p)}</option>`));
-  seletorPeriodo.innerHTML = opcoes.join('');
-  seletorPeriodo.value = periodoAtual;
-  atualizarSetasPeriodo();
+function esc(texto) {
+  return String(texto ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-function atualizarSetasPeriodo() {
-  const periodos = periodosDisponiveis();
-  const indice = periodos.indexOf(periodoAtual);
-  btnPeriodoAnterior.disabled = periodoAtual === 'todos' || indice === periodos.length - 1;
-  btnPeriodoProximo.disabled = periodoAtual === 'todos' || indice <= 0;
+// Mês inicial: o mês corrente se tiver transações; senão o mais recente com dados.
+function escolherMesInicial() {
+  const meses = [...new Set(todasTransacoes.map(t => t.data.slice(0, 7)))].sort();
+  const corrente = mesCorrente();
+  if (meses.length === 0 || meses.includes(corrente)) return corrente;
+  const anteriores = meses.filter(m => m < corrente);
+  return anteriores.length ? anteriores[anteriores.length - 1] : meses[0];
+}
+
+// RF03: o relatório do mês vem da API (/api/relatorios?mes=AAAA-MM); mesAnterior/proximoMes guiam a navegação.
+async function carregarRelatorio(mes) {
+  const seq = ++relatorioSeq;
+  const inicio = performance.now();
+  const resp = await fetch(`${API}/relatorios?mes=${mes}`);
+  if (seq !== relatorioSeq) return; // resposta de uma navegação antiga
+  if (!resp.ok) {
+    const erro = await resp.json().catch(() => null);
+    mostrarToast(erro?.mensagem || 'Não foi possível carregar o relatório.', 'error');
+    return;
+  }
+  relatorio = await resp.json();
+  periodoAtual = relatorio.mes;
+  rotuloPeriodoEl.textContent = rotuloPeriodoCapitalizado(relatorio.mes);
+  btnPeriodoHoje.disabled = relatorio.mes === mesCorrente();
+  renderizarResumo(relatorio);
+  renderizarGrafico(relatorio);
+  renderizarTransacoes(transacoesFiltradasParaTabela());
+  console.info(`Relatório ${mes} carregado em ${Math.round(performance.now() - inicio)} ms (RNF02: < 3000 ms)`);
 }
 
 function transacoesDoPeriodo() {
-  if (periodoAtual === 'todos') return todasTransacoes;
   return todasTransacoes.filter(t => t.data.startsWith(periodoAtual));
 }
 
@@ -617,58 +660,61 @@ function transacoesFiltradasParaTabela() {
     .sort((a, b) => b.data.localeCompare(a.data));
 }
 
-function atualizarTudo() {
-  const doPeriodo = transacoesDoPeriodo();
-  renderizarResumo(doPeriodo);
-  renderizarGrafico(doPeriodo);
-  renderizarTransacoes(transacoesFiltradasParaTabela());
-}
-
-function renderizarResumo(transacoes) {
-  const receitas = transacoes.filter(t => t.tipo === 'RECEITA').reduce((s, t) => s + Number(t.valor), 0);
-  const despesas = transacoes.filter(t => t.tipo === 'DESPESA').reduce((s, t) => s + Number(t.valor), 0);
-  const saldo = receitas - despesas;
-
-  document.getElementById('total-receitas').textContent = formatarMoeda(receitas);
-  document.getElementById('total-despesas').textContent = formatarMoeda(despesas);
+function renderizarResumo(r) {
+  document.getElementById('total-receitas').textContent = formatarMoeda(r.totalReceitas);
+  document.getElementById('total-despesas').textContent = formatarMoeda(r.totalDespesas);
   const saldoEl = document.getElementById('total-saldo');
-  saldoEl.textContent = formatarMoeda(saldo);
-  saldoEl.classList.toggle('negativo', saldo < 0);
+  saldoEl.textContent = formatarMoeda(r.saldo);
+  saldoEl.classList.toggle('negativo', Number(r.saldo) < 0);
 }
 
-function renderizarGrafico(transacoes) {
-  const despesas = transacoes.filter(t => t.tipo === 'DESPESA');
-  const totalDespesas = despesas.reduce((s, t) => s + Number(t.valor), 0);
+const CORES_GRAFICO = ['#4f5fed', '#e0473a', '#17a672', '#f2a33a', '#8a5cf6', '#14a3c7', '#d6559b', '#6b7280'];
 
-  const porCategoria = new Map();
-  despesas.forEach(t => porCategoria.set(t.categoria.nome, (porCategoria.get(t.categoria.nome) || 0) + Number(t.valor)));
-  const dados = [...porCategoria.entries()]
-    .map(([nome, total]) => ({ nome, total }))
-    .sort((a, b) => b.total - a.total);
-
+function renderizarGrafico(r) {
+  const dados = r.despesasPorCategoria;
   chartContainer.innerHTML = '';
+  donut.innerHTML = '';
 
   if (dados.length === 0) {
     chartEmpty.style.display = 'block';
+    chartLayout.style.display = 'none';
     chartSubtitle.style.display = 'none';
     return;
   }
 
   chartEmpty.style.display = 'none';
+  chartLayout.style.display = '';
   chartSubtitle.style.display = 'block';
-  chartSubtitle.textContent = `Total de ${formatarMoeda(totalDespesas)} em ${dados.length} categoria${dados.length > 1 ? 's' : ''}`;
+  chartSubtitle.textContent = `Total de ${formatarMoeda(r.totalDespesas)} em ${dados.length} categoria${dados.length > 1 ? 's' : ''} em ${rotuloPeriodo(r.mes)}`;
 
-  const maiorValor = dados[0].total;
-  dados.forEach(d => {
-    const larguraPct = (d.total / maiorValor) * 100;
-    const participacaoPct = Math.round((d.total / totalDespesas) * 100);
+  // Rosca em SVG: cada fatia é um círculo com stroke-dasharray proporcional ao percentual
+  const raio = 40, circ = 2 * Math.PI * raio;
+  let acumulado = 0;
+  dados.forEach((d, i) => {
+    const frac = Number(d.percentual) / 100;
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('class', 'fatia');
+    c.setAttribute('cx', 60); c.setAttribute('cy', 60); c.setAttribute('r', raio);
+    c.setAttribute('stroke', CORES_GRAFICO[i % CORES_GRAFICO.length]);
+    c.setAttribute('stroke-dasharray', `${frac * circ} ${circ}`);
+    c.setAttribute('stroke-dashoffset', -acumulado * circ);
+    c.setAttribute('transform', 'rotate(-90 60 60)');
+    donut.appendChild(c);
+    acumulado += frac;
+  });
+  const t1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  t1.setAttribute('x', 60); t1.setAttribute('y', 63); t1.textContent = 'Despesas';
+  donut.appendChild(t1);
+
+  dados.forEach((d, i) => {
+    const cor = CORES_GRAFICO[i % CORES_GRAFICO.length];
     const row = document.createElement('div');
     row.className = 'chart-row';
-    row.title = `${d.nome}: ${formatarMoeda(d.total)} (${participacaoPct}% das despesas do período)`;
+    row.title = `${d.categoria}: ${formatarMoeda(d.valor)} (${Number(d.percentual).toFixed(2).replace('.', ',')}% das despesas do mês)`;
     row.innerHTML = `
-      <div class="chart-label">${d.nome}</div>
-      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${larguraPct}%"></div></div>
-      <div class="chart-value">${formatarMoeda(d.total)}</div>
+      <div class="chart-label"><span class="swatch" style="background:${cor}"></span>${esc(d.categoria)}</div>
+      <div class="chart-bar-track"><div class="chart-bar-fill" style="width:${Number(d.percentual)}%;background:${cor}"></div></div>
+      <div class="chart-value">${formatarMoeda(d.valor)} <span class="chart-pct">${Number(d.percentual).toFixed(1).replace('.', ',')}%</span></div>
     `;
     chartContainer.appendChild(row);
   });
@@ -688,8 +734,8 @@ function renderizarTransacoes(transacoes) {
       tr.innerHTML = `
         <td>${t.data.split('-').reverse().join('/')}</td>
         <td><span class="pill ${isReceita ? 'receita' : 'despesa'}">${isReceita ? 'Receita' : 'Despesa'}</span></td>
-        <td>${t.categoria.nome}</td>
-        <td class="descricao">${t.descricao || '—'}</td>
+        <td>${esc(t.categoria.nome)}</td>
+        <td class="descricao">${esc(t.descricao) || '—'}</td>
         <td class="valor" style="color:${isReceita ? 'var(--receita)' : 'var(--despesa)'}">${isReceita ? '+' : '-'} ${formatarMoeda(t.valor)}</td>
         <td>
           <div class="row-actions">
@@ -702,38 +748,35 @@ function renderizarTransacoes(transacoes) {
     });
 }
 
-function exportarCsv() {
-  const transacoes = transacoesFiltradasParaTabela();
-  if (transacoes.length === 0) {
-    mostrarToast('Não há transações para exportar neste filtro.', 'error');
+// RF05: o CSV é gerado no servidor (GET /api/transacoes/exportar?de=&ate=) para o período escolhido.
+async function exportarCsv() {
+  const de = document.getElementById('exp-de').value;
+  const ate = document.getElementById('exp-ate').value;
+  if (de && ate && de > ate) {
+    mostrarToast('A data inicial não pode ser posterior à data final.', 'error');
     return;
   }
+  const params = new URLSearchParams();
+  if (de) params.set('de', de);
+  if (ate) params.set('ate', ate);
 
-  const linhas = [['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor'].join(';')];
-  transacoes
-    .slice()
-    .sort((a, b) => a.data.localeCompare(b.data))
-    .forEach(t => {
-      linhas.push([
-        t.data.split('-').reverse().join('/'),
-        t.tipo === 'RECEITA' ? 'Receita' : 'Despesa',
-        t.categoria.nome,
-        (t.descricao || '').replace(/;/g, ','),
-        Number(t.valor).toFixed(2).replace('.', ',')
-      ].join(';'));
-    });
-
-  const csv = '﻿' + linhas.join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const resp = await fetch(`${API}/transacoes/exportar?${params}`);
+  if (!resp.ok) {
+    const erro = await resp.json().catch(() => null);
+    mostrarToast(erro?.mensagem || 'Erro ao exportar transações.', 'error');
+    return;
+  }
+  const blob = await resp.blob();
+  const nome = (resp.headers.get('Content-Disposition') || '').match(/filename="?([^";]+)"?/)?.[1] || 'finapp-transacoes.csv';
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `finapp-transacoes-${periodoAtual}.csv`;
+  a.download = nome;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  mostrarToast(`${transacoes.length} transação(ões) exportada(s).`, 'ok');
+  mostrarToast('Exportação concluída.', 'ok');
 }
 
 function limparFormulario() {
@@ -779,34 +822,12 @@ async function excluirTransacao(id) {
 
 radiosTipo.forEach(r => r.addEventListener('change', renderizarOpcoesCategoria));
 
-seletorPeriodo.addEventListener('change', () => {
-  periodoAtual = seletorPeriodo.value;
-  atualizarSetasPeriodo();
-  atualizarTudo();
-});
+btnPeriodoAnterior.addEventListener('click', () => carregarRelatorio(relatorio.mesAnterior));
+btnPeriodoProximo.addEventListener('click', () => carregarRelatorio(relatorio.proximoMes));
+btnPeriodoHoje.addEventListener('click', () => carregarRelatorio(mesCorrente()));
 
-btnPeriodoAnterior.addEventListener('click', () => {
-  const periodos = periodosDisponiveis();
-  const indice = periodos.indexOf(periodoAtual);
-  if (indice === -1 || indice >= periodos.length - 1) return;
-  periodoAtual = periodos[indice + 1];
-  seletorPeriodo.value = periodoAtual;
-  atualizarSetasPeriodo();
-  atualizarTudo();
-});
-
-btnPeriodoProximo.addEventListener('click', () => {
-  const periodos = periodosDisponiveis();
-  const indice = periodos.indexOf(periodoAtual);
-  if (indice <= 0) return;
-  periodoAtual = periodos[indice - 1];
-  seletorPeriodo.value = periodoAtual;
-  atualizarSetasPeriodo();
-  atualizarTudo();
-});
-
-filtroTipo.addEventListener('change', atualizarTudo);
-campoBusca.addEventListener('input', atualizarTudo);
+filtroTipo.addEventListener('change', () => renderizarTransacoes(transacoesFiltradasParaTabela()));
+campoBusca.addEventListener('input', () => renderizarTransacoes(transacoesFiltradasParaTabela()));
 btnExportar.addEventListener('click', exportarCsv);
 
 tabelaBody.addEventListener('click', (ev) => {

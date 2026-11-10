@@ -40,4 +40,24 @@ interface TransacaoRepository : JpaRepository<Transacao, Long> {
         @Param("inicio") inicio: LocalDate,
         @Param("fim") fim: LocalDate
     ): List<TotalPorCategoria>
+
+    /** RF05: transações no intervalo fechado [de, ate], em ordem cronológica. Limites nulos não restringem. */
+    @Query(
+        """
+        select t from Transacao t join fetch t.categoria
+        where (cast(:de as date) is null or t.data >= :de) and (cast(:ate as date) is null or t.data <= :ate)
+        order by t.data asc, t.id asc
+        """
+    )
+    fun buscarParaExportacao(@Param("de") de: LocalDate?, @Param("ate") ate: LocalDate?): List<Transacao>
+
+    /** RF04: saldo (receitas − despesas) no intervalo fechado [inicio, fim], somado no banco. Sem transações, devolve 0. */
+    @Query(
+        """
+        select coalesce(sum(case when t.tipo = com.finapp.model.TipoTransacao.RECEITA then t.valor else -t.valor end), 0)
+        from Transacao t
+        where t.data >= :inicio and t.data <= :fim
+        """
+    )
+    fun saldoNoPeriodo(@Param("inicio") inicio: LocalDate, @Param("fim") fim: LocalDate): java.math.BigDecimal
 }
