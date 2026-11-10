@@ -51,7 +51,7 @@ Os pacotes 3.3.4–3.3.6 e a conclusão de 3.3.7 ficam para a rodada 3, junto de
 | #19/#20 | Queries e endpoint mensal; [PR #36](https://github.com/ArbenTafili/finapp_Uff/pull/36) e [PR #37](https://github.com/ArbenTafili/finapp_Uff/pull/37). | Main |
 | #29 | Massa D1–D4 e preparação técnica; [PR #38](https://github.com/ArbenTafili/finapp_Uff/pull/38). | Documento e massa de demonstração na main |
 
-Para novas alterações, o fluxo é: branch criada a partir da `main` → Pull Request para `main` → revisão e aprovação por outro integrante → merge, conforme a [Seção 8 — Controle de Versões](../plano-projeto/secao-8-controle-versoes.md).
+O fluxo de publicação é branch criada a partir da main → PR para develop → main.
 
 As regras de categorias estão descritas no [ADR 002](../rodada1/10-decisoes-tecnicas.md). A persistência local está registrada no [RDT-01](../adr/RDT-01.md).
 
