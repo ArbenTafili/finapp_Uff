@@ -10,7 +10,7 @@ Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da
 | Demo v2 | `v0.2.0` | Rodada 2 (início de out/2026) | `7c96a25` (merge #55, 06/10) | RF01 e RF02 concluídos, Flyway/PostgreSQL, relatório mensal na API (RF03 parcial) |
 | Demo v3 / final | `v1.0.0` | Rodada 3 (nov/2026) | Merge do PR #66 (este histórico) na `main` (13/11) | RF03 interface, RF04 metas, RF05 exportação CSV, gestão de categorias, deploy com conta de teste, tela de login (#62), testes ampliados (#61, suíte com 130 testes) e EAP revisada (#59) |
 | Final, documentação revisada | `v1.0.1` | Rodada 3 (nov/2026) | Merge do PR #67 na `main` (13/11) | Mesmo código da `v1.0.0`; PDF consolidado gerado de novo com o histórico de versões e as horas atualizados, e script do PDF para macOS, Windows e Linux |
-| Final, relatório formal | `v1.0.2` | Rodada 3 (nov/2026) | Merge do PR #68 na `main` (13/11) | Mesmo código da `v1.0.0`; consolidado em formato de relatório (ABNT) com sumário paginado, visão geral das três entregas com burndown geral, artefatos das Rodadas 1 e 2 incluídos e correções de dados nos documentos |
+| Final, relatório formal | `v1.0.2` | Rodada 3 (nov/2026) | Merge do PR #68 na `main` (13/11) | Mesmo código da `v1.0.0`; consolidado em formato de relatório (ABNT) com sumário paginado, visão geral das três entregas com burndown geral, artefatos das Rodadas 1 e 2 incluídos, slides da Rodada 2 na `main` e correções de dados nos documentos |
 
 O código da Demo v1 entrou na `develop` pelo PR #2 (`d9e37a2`, 05/09) e chegou à `main` no merge do PR #9 (`db71473`). O código-fonte dos dois commits é idêntico; a tag `v0.1.0` fica no commit da `main`.
 
@@ -54,13 +54,15 @@ Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.2` mostr
 | `docs/roteiro-demo-v3-login` | #65 | Roteiro da Demo v3 com acesso pela tela de login; suíte com 130 testes, 0 falhas (13/11) | 1.2 · 4.9 |
 | `docs/historico-versoes-horas` | #66 | Histórico de versões, tags `v0.1.0`/`v0.2.0`/`v1.0.0` e horas da Rodada 3 | 1.1 · 1.6 |
 | `docs/pdf-consolidado-multiplataforma` | #67 | Script do PDF consolidado para macOS, Windows e Linux, PDF gerado de novo e tag `v1.0.1` | 1.6 |
-| `docs/consolidado-visao-entregas` | #68 | Visão geral das três entregas com burndown geral, formato de relatório (ABNT) com sumário paginado, correções nos documentos e tag `v1.0.2` | 1.6 |
+| `docs/consolidado-visao-entregas` | #68 | Visão geral das três entregas com burndown geral, formato de relatório (ABNT) com sumário paginado, correções nos documentos, slides da Rodada 2 trazidos da `develop` e tag `v1.0.2` | 1.6 |
 
 Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → #66 → #67 → #68.
 
 A Demo v3 foi apresentada em 28/10 a partir das branches da Rodada 3. A integração na `main` foi feita entre 09/11 e 13/11, junto com a tela de login, os testes finais e a documentação consolidada.
 
 Convenção de commits mantida: `tipo(escopo): descrição #issue`. Nas Rodadas 1 e 2 o fluxo foi branch → PR → `develop` → `main`; na Rodada 3 as branches foram integradas direto na `main` por PR, com a `release/rodada3` concentrando as funcionalidades (ver `docs/adr/estrategia-branches.md`).
+
+Os PRs #56 (slides da Rodada 2) e #57 (cronograma e orçamento) foram integrados só na `develop`, depois do último merge `develop` → `main` (#55). Os slides da Rodada 2 chegaram à `main` no #68; o cronograma do #57 foi substituído pela versão consolidada do #63.
 
 ## Histórico da `main` (primeiro pai, do mais recente ao mais antigo)
 
