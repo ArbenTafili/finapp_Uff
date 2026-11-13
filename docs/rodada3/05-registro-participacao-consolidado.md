@@ -7,7 +7,7 @@
 | Membro | Papel | I1 (prev./real.) | I2 (prev./real.) | I3 (prev./real.) | Total real |
 |---|---|---|---|---|---|
 | Filipe | Gerente de Projeto | _a conferir na R1_ | 28 / 28 | ___ / ___ | ___ |
-| Sara | Product Owner | _a conferir na R1_ | 26 / 26 | ___ / ___ | ___ |
+| Sara | Product Owner | 8 / 8 | 26 / 26 | ___ / ___ | ___ |
 | Emanuel | Scrum Master | _a conferir na R1_ | 26 / 24 | ___ / ___ | ___ |
 | Arben | Gerente de Configuração | _a conferir na R1_ | 30 / 34 | ___ / ___ | ___ |
 | Enzo | Desenvolvedor (Infra/DB) | _a conferir na R1_ | 34 / 42 | ___ / ___ | ___ |

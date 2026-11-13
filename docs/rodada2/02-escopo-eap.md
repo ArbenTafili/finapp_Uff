@@ -61,6 +61,34 @@ A ausência de autenticação é intencional nesta fase. Não será criada uma e
 
 A EAP foi organizada de forma hierárquica para permitir que seus pacotes sejam utilizados diretamente nas estimativas de Planning Poker, no cronograma, no acompanhamento de horas e nas métricas de monitoramento do projeto.
 
+### Diagrama da EAP
+
+```mermaid
+flowchart TB
+    F["FinApp"]
+
+    F --- P["1. Planejamento e configuração"]
+    F --- A["2. Arquitetura e infraestrutura"]
+    F --- I["3. Implementação"]
+    F --- Q["4. Qualidade e demonstrações"]
+
+    P --- P1["Repositório, backlog e planejamento"]
+    P --- P2["Modelagem, regras e baseline"]
+
+    A --- A1["Aplicação, persistência e validações"]
+    A --- A2["Docker e estrutura de testes"]
+
+    I --- RF01["3.1 Transações"]
+    I --- RF02["3.2 Categorias"]
+    I --- RF03["3.3 Relatórios"]
+    I --- RF04["3.4 Metas de economia"]
+    I --- RF05["3.5 Exportação CSV"]
+
+    Q --- Q1["Testes funcionais"]
+    Q --- Q2["Usabilidade e compatibilidade"]
+    Q --- Q3["Demo v1, v2 e v3"]
+```
+
 ### 1. Planejamento, configuração e baseline da Rodada 1
 
 | ID EAP | Pacote de Trabalho | Descrição | Requisito relacionado |
