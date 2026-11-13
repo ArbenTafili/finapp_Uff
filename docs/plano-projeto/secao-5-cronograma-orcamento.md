@@ -52,14 +52,14 @@ gantt
 
 | ID EAP | Descrição da Atividade | Período Planejado | Período Realizado | Status de Prazo | Diagnóstico e Impacto Gerencial |
 |:---:|---|:---:|:---:|:---:|---|
-| **1.1–1.6** | Planejamento, Setup e Baseline R1 | 01/09 a 14/09 | 01/09 a 14/09 | **No Prazo** | Entregas perfeitamente alinhadas com o marco da Demo v1. |
-| **3.1** | RF01 — Gerenciar Transações | 15/09 a 25/09 | 15/09 a 24/09 | **No Prazo** | Implementação das regras financeiras sem gargalos. |
-| **3.2** | RF02 — Gerenciar Categorias | 20/09 a 30/09 | 20/09 a 28/09 | **No Prazo** | Categorias padrão e personalizadas integradas com sucesso. |
+| **1.1–1.6** | Planejamento, Setup e Baseline R1 | 01/09 a 14/09 | 01/09 a 14/09 | **No Prazo** | Demo v1 entregue em 14/09, como planejado. |
+| **3.1** | RF01 — Gerenciar Transações | 15/09 a 25/09 | 15/09 a 24/09 | **No Prazo** | Regras de data (ADR 001) e de valor implementadas com testes. |
+| **3.2** | RF02 — Gerenciar Categorias | 20/09 a 30/09 | 20/09 a 28/09 | **No Prazo** | Categorias padrão e personalizadas prontas, com as regras do ADR 002. |
 | **2.2** | Migração Docker e PostgreSQL (RDT-01) | 18/09 a 24/09 | 18/09 a 29/09 | **Com Atraso (+5 dias / +8h)** | Curva de aprendizado de containerização. Desvio absorvido pelo paralelismo dos desenvolvedores, sem atrasar o milestone da rodada. |
 | **3.3** | Agregações SQL e Queries do RF03 | 01/10 a 06/10 | 27/09 a 04/10 | **Adiantado (-2 dias)** | Antecipação de escopo que conferiu folga para a Rodada 3. |
-| **3.3–3.5** | RF03 UI, RF04 Metas e RF05 CSV | 07/10 a 24/10 | 07/10 a 23/10 | **No Prazo** | Produtividade acelerada pela estabilidade do Docker. |
-| **4.9** | Deploy Render e Conta de Teste | 18/10 a 26/10 | 18/10 a 25/10 | **No Prazo** | Publicação em nuvem com autenticação HTTP Basic homologada. |
-| **5.0** | Retrospectiva, PDF Consolidado e Fechamento | 22/10 a 28/10 | 22/10 a 28/10 | **No Prazo** | Reunião gravada e documentação consolidada prontas para a banca. |
+| **3.3–3.5** | RF03 UI, RF04 Metas e RF05 CSV | 07/10 a 24/10 | 07/10 a 23/10 | **No Prazo** | Com o Docker estável, RF03, RF04 e RF05 ficaram prontos em 17 dias. |
+| **4.9** | Deploy Render e Conta de Teste | 18/10 a 26/10 | 18/10 a 25/10 | **No Prazo** | Publicação no Render com conta de teste (login por tela desde o PR #62). |
+| **5.0** | Retrospectiva, PDF Consolidado e Fechamento | 22/10 a 28/10 | 22/10 a 28/10 | **No Prazo** | Retrospectiva gravada e documento consolidado gerado. |
 
 ---
 

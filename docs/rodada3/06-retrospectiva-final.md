@@ -19,9 +19,9 @@ A entrega é uma reunião de retrospectiva gravada, com **participação ativa d
 |---|---|---|
 | | | |
 
-Pontos que o repositório já sugere discutir, se fizerem sentido para vocês:
+Pauta de discussão:
 
-- Distribuição de commits concentrada em poucas pessoas (Enzo 19, Filipe 13 contra 2–5 dos demais): foi reflexo dos papéis (docs/gestão) ou de desbalanceamento?
+- Distribuição de commits concentrada em poucas pessoas (Enzo 20, Filipe 14, Giovana 11, Sara 7, Arben 5, Emanuel 2): foi reflexo dos papéis (docs/gestão) ou de desbalanceamento?
 - O setup Docker/PostgreSQL gerou desvio de ~8 h na I2: as ações corretivas funcionaram na I3?
 - PRs revisados por quem? O fluxo `develop → main` acelerou ou atrasou a integração?
 - RF04 (Metas) foi deslocado da I2 para a I3 no backlog: a repriorização foi acertada?

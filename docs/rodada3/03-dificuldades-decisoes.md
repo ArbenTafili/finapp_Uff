@@ -1,6 +1,6 @@
 # Dificuldades encontradas e decisões técnicas e de processo
 
-Consolida os registros das rodadas anteriores ([ADRs](../rodada1/10-decisoes-tecnicas.md), [RDT-01](../adr/RDT-01.md), [estratégia de branches](../adr/estrategia-branches.md)) e acrescenta as decisões da Rodada 3. Itens marcados **(equipe)** pedem a confirmação de quem viveu a situação antes da entrega.
+Consolida os registros das rodadas anteriores ([ADRs](../rodada1/10-decisoes-tecnicas.md), [RDT-01](../adr/RDT-01.md), [estratégia de branches](../adr/estrategia-branches.md)) e acrescenta as decisões da Rodada 3.
 
 ## Linha do tempo
 
