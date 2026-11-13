@@ -27,7 +27,7 @@ git push origin --tags
 | `feature/rf05-exportacao-csv` | `GET /api/transacoes/exportar?de=&ate=`, CSV pt-BR com proteção contra injeção de fórmulas, seleção de período na interface | RF05 · 3.5.1–3.5.5 · 4.4 |
 | `feature/rf04-metas` | Entidade `Meta`, migração V3, CRUD, cancelamento, progresso, status e página `metas.html` | RF04 · 3.4.1–3.4.9 · 4.1 |
 | `feature/rf02-interface-categorias` | Página `categorias.html` para categorias personalizadas | RF02 (acabamento) |
-| `infra/deploy-conta-teste` | Perfil `prod`, conta de teste (login por sessão desde `feature/tela-login`), seed de demonstração, `render.yaml`, guia de deploy | 4.9 · Demo v3 |
+| `infra/deploy-conta-teste` | Perfil `prod`, conta de teste (HTTP Basic), seed de demonstração, `render.yaml`, guia de deploy | 4.9 · Demo v3 |
 | `release/rodada3` | Integração das quatro primeiras (um conflito resolvido em `TransacaoRepository.kt`) | — |
 | `docs/rodada3-entrega-final` | Documentos consolidados da Rodada 3 | Entrega final |
 

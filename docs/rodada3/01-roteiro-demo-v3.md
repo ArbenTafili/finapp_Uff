@@ -10,7 +10,7 @@ Acesso: versão publicada com a conta de teste (ver [deploy-conta-teste.md](depl
 
 | # | Passo | Resultado esperado | Requisito |
 |---|---|---|---|
-| 1 | Abrir o endereço da aplicação; na versão publicada, entrar pela tela de login com a conta de teste | Tela principal no mês corrente, com saldo, rosca e barras de despesas por categoria | RF03 |
+| 1 | Abrir o endereço da aplicação; na versão publicada, informar a conta de teste | Tela principal no mês corrente, com saldo, rosca e barras de despesas por categoria | RF03 |
 | 2 | Clicar em ‹ para voltar três meses e em “Mês atual” | Totais e gráfico mudam por mês; ‹ › funcionam mesmo em meses sem dados | RF03 (3.3.6) |
 | 3 | Cadastrar uma receita e uma despesa de hoje | Mensagem de sucesso; totais e gráfico atualizam sem recarregar | RF01 |
 | 4 | Tentar data futura ou valor com 3 casas decimais | Erro claro, nada é gravado | RF01 / RNF05 |

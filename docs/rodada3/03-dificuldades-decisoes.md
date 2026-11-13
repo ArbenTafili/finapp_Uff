@@ -20,7 +20,7 @@ Consolida os registros das rodadas anteriores ([ADRs](../rodada1/10-decisoes-tec
 | 3 | Descrições digitadas pelo usuário podem executar fórmulas ao abrir o CSV (`=`, `+`, `-`, `@`) | Prefixar com apóstrofo e testar | `ExportacaoServiceTest` |
 | 3 | Nomes de categoria/descrição entravam no `innerHTML` da interface (XSS) | Escape de texto em todas as páginas | `index.html`, `metas.html`, `categorias.html` |
 | 3 | Safari não suporta `input type="month"` (RNF04) | Navegação mensal própria (‹ mês ›), sem o componente nativo | `index.html` |
-| 3 | “Conta de teste” para a versão publicada, sem entidade `Usuario` no escopo | Credencial única com tela de login (sessão por cookie; Basic mantido para API), configurada por variáveis de ambiente, ligada só no perfil `prod`; **não** é cadastro de usuários | `AcessoTesteFilter` |
+| 3 | “Conta de teste” para a versão publicada, sem entidade `Usuario` no escopo | Credencial única por HTTP Basic, configurada por variáveis de ambiente, ligada só no perfil `prod`; **não** é cadastro de usuários | `AcessoTesteFilter` |
 | 3 | Branches paralelas editando os mesmos arquivos | Páginas novas separadas (`metas.html`, `categorias.html`) reduziram conflitos; o único conflito (consultas em `TransacaoRepository`) foi resolvido numa branch de integração (`release/rodada3`) | histórico de versões |
 
 ## Decisões da Rodada 3 em detalhe
@@ -39,8 +39,8 @@ Consolida os registros das rodadas anteriores ([ADRs](../rodada1/10-decisoes-tec
 
 ### D3-03 — Conta de teste sem sistema de usuários
 
-- **Decisão:** tela de login (`/login.html`) com um par usuário/senha por ambiente, sessão por cookie HttpOnly/SameSite=Lax e botão Sair; HTTP Basic segue aceito só para clientes de API. Mantém RNF03 e o escopo; a senha é gerada na hospedagem e nunca versionada.
-- **Limitação assumida:** todos que têm a credencial compartilham os dados; sem proteção contra tentativas repetidas de senha (força bruta) nem token CSRF além do SameSite=Lax do cookie. Adequado à demonstração, não a produção real.
+- **Decisão:** HTTP Basic com um par usuário/senha por ambiente. Mantém RNF03 e o escopo; a senha é gerada na hospedagem e nunca versionada.
+- **Limitação assumida:** todos que têm a credencial compartilham os dados; não há CSRF/sessão. Adequado à demonstração, não a produção real.
 
 ## Para completar (equipe)
 
