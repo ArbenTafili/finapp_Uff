@@ -1092,6 +1092,7 @@ CSS = """
     code {
       font-family: "Courier New", Courier, monospace;
       font-size: 10pt;
+      hyphens: none;  /* nome de classe, arquivo ou comando nao leva hifen */
     }
     pre {
       font-family: "Courier New", Courier, monospace;

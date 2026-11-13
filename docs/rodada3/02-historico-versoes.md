@@ -58,6 +58,8 @@ Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.2` mostr
 
 Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → #66 → #67 → #68.
 
+A Demo v3 foi apresentada em 28/10 a partir das branches da Rodada 3. A integração na `main` foi feita entre 09/11 e 13/11, junto com a tela de login, os testes finais e a documentação consolidada.
+
 Convenção de commits mantida: `tipo(escopo): descrição #issue`. Nas Rodadas 1 e 2 o fluxo foi branch → PR → `develop` → `main`; na Rodada 3 as branches foram integradas direto na `main` por PR, com a `release/rodada3` concentrando as funcionalidades (ver `docs/adr/estrategia-branches.md`).
 
 ## Histórico da `main` (primeiro pai, do mais recente ao mais antigo)

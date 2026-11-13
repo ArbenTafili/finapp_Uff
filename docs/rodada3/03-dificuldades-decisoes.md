@@ -7,7 +7,7 @@ Consolida os registros das rodadas anteriores ([ADRs](../rodada1/10-decisoes-tec
 | Rodada | Dificuldade | Decisão / resposta | Registro |
 |---|---|---|---|
 | 1 | Requisito UC01 pedia bloquear “datas anteriores ao cadastro”, mas não há entidade `Usuario` no escopo | Bloquear apenas datas futuras (`data <= hoje`); evita scope creep e preserva o registro retroativo | ADR 001 |
-| 1 | Nem todo ambiente de desenvolvimento tem Docker **(equipe: confirmar)** | H2 em memória como perfil padrão de desenvolvimento; PostgreSQL via Docker na execução integrada | README |
+| 1 | Desenvolver e demonstrar também em máquinas sem Docker | H2 em memória como perfil padrão de desenvolvimento e plano B da demo; PostgreSQL via Docker na execução integrada | README, EAP 2.2, `PerfilH2Test` |
 | 2 | RNF03 (dados locais) e persistência: H2 não representa o ambiente real | PostgreSQL local via Docker Compose, perfis `h2`, `dev`, `docker`, `test` | RDT-01 |
 | 2 | Valores monetários com risco de erro de arredondamento (risco nº 1) | `NUMERIC(19,2)` + `BigDecimal` em todo o fluxo; schema versionado com Flyway (baseline para bancos da Demo v1) | Issue #15 |
 | 2 | Regras de exclusão/edição de categoria não especificadas | Bloquear exclusão com transações, categorias padrão imutáveis, nome único por tipo, tipo da transação igual ao da categoria | ADR 002 |
@@ -42,7 +42,9 @@ Consolida os registros das rodadas anteriores ([ADRs](../rodada1/10-decisoes-tec
 - **Decisão:** tela de login (`/login.html`) com um par usuário/senha por ambiente, sessão por cookie HttpOnly/SameSite=Lax e botão Sair; HTTP Basic segue aceito só para clientes de API. Mantém RNF03 e o escopo; a senha é gerada na hospedagem e nunca versionada.
 - **Limitação assumida:** todos que têm a credencial compartilham os dados; sem proteção contra tentativas repetidas de senha (força bruta) nem token CSRF além do SameSite=Lax do cookie. Adequado à demonstração, não a produção real.
 
-## Para completar (equipe)
+## Dificuldades de processo na Rodada 3
 
-- Dificuldades de processo da Rodada 3 vividas por vocês (comunicação, prazos, revisão de PR, divisão do trabalho). **(equipe)**
-- Impacto real das decisões acima no esforço da I3, com as horas do [monitoramento](04-monitoramento-consolidado.md). **(equipe)**
+- **Integração no fim da rodada:** a Demo v3 foi apresentada em 28/10 a partir das branches da Rodada 3, mas a integração na `main` ficou para 09/11 (#58) e 13/11, quando oito PRs (#59 e #61 a #67) entraram no mesmo dia.
+- **Revisão concentrada:** dos nove PRs da Rodada 3, seis foram aprovados pela Giovana e três pelo Enzo.
+- **Mudança de fluxo:** a `develop` deixou de ser usada; a `release/rodada3` juntou as quatro funcionalidades e teve um conflito em `TransacaoRepository.kt`.
+- **Esforço das decisões** (seção 3 do [registro de participação](05-registro-participacao-consolidado.md)): metas (D3-01) 34 h, exportação CSV (D3-02) 30 h, conta de teste e tela de login (D3-03) 16 h + 20 h.

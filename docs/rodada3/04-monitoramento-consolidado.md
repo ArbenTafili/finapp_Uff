@@ -179,7 +179,7 @@ xychart-beta
 *   **Requisitos Funcionais:** 100% entregues:
     *   *RF01 (Transações):* CRUD completo com validações de data (`<= hoje`) e valor positivo.
     *   *RF02 (Categorias):* Categorias padrão protegidas e personalizadas completas.
-    *   *RF03 (Relatórios):* Agregações mensais em banco, gráfico de rosca interativo e tempo de carregamento < 3s (RNF02).
+    *   *RF03 (Relatórios):* Agregações mensais em banco e gráfico de rosca interativo. O RNF02 (relatório em menos de 3 s) é verificado pelo teste automatizado `RelatorioControllerTest`, que gera o relatório de um mês numa base de 20 mil transações em PostgreSQL.
     *   *RF04 (Metas de Economia):* Cadastro, acompanhamento automático via saldo acumulado e status dinâmico.
     *   *RF05 (Exportação CSV):* Filtro por intervalo de datas, sanitização e acentuação correta.
 *   **Qualidade:** 130 testes automatizados passando em 13/11 (`./gradlew test`), entre testes unitários de domínio, de serviços e de integração com PostgreSQL.
