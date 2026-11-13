@@ -8,7 +8,7 @@ Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da
 |---|---|---|---|---|
 | Demo v1 | `v0.1.0` | Rodada 1 (início de set/2026) | `db71473` (merge do PR #9, `develop` → `main`, 07/09) | CRUD de transações e categorias, interface web simples, Docker |
 | Demo v2 | `v0.2.0` | Rodada 2 (início de out/2026) | `7c96a25` (merge #55, 06/10) | RF01 e RF02 concluídos, Flyway/PostgreSQL, relatório mensal na API (RF03 parcial) |
-| Demo v3 / final | `v1.0.0` | Rodada 3 (nov/2026) | Merge do PR deste histórico na `main` (13/11) | RF03 interface, RF04 metas, RF05 exportação CSV, gestão de categorias, deploy com conta de teste, tela de login (#62), testes ampliados (#61, suíte com 130 testes) e EAP revisada (#59) |
+| Demo v3 / final | `v1.0.0` | Rodada 3 (nov/2026) | Merge do PR #66 (este histórico) na `main` (13/11) | RF03 interface, RF04 metas, RF05 exportação CSV, gestão de categorias, deploy com conta de teste, tela de login (#62), testes ampliados (#61, suíte com 130 testes) e EAP revisada (#59) |
 
 O código da Demo v1 entrou na `develop` pelo PR #2 (`d9e37a2`, 05/09) e chegou à `main` no merge do PR #9 (`db71473`). O código-fonte dos dois commits é idêntico; a tag `v0.1.0` fica no commit da `main`.
 
@@ -19,7 +19,7 @@ Tags anotadas criadas pelo Gerente de Configuração em 13/11/2026, depois de to
 ```bash
 git tag -a v0.1.0 db71473 -m "Demo v1 - Rodada 1"
 git tag -a v0.2.0 7c96a25 -m "Demo v2 - Rodada 2"
-git tag -a v1.0.0 origin/main -m "Entrega final - Demo v3 - Rodada 3"   # logo após o merge deste PR
+git tag -a v1.0.0 origin/main -m "Entrega final - Demo v3 - Rodada 3"   # merge do PR #66
 git push origin v0.1.0 v0.2.0 v1.0.0
 ```
 
@@ -42,9 +42,9 @@ Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.0` mostr
 | `docs/consolidacao-final-gp` | #63 | EVM acumulado final, burndowns por rodada e acumulado, Gantt, orçamento detalhado e PDF consolidado | 1.6 |
 | `docs/rodada3-conferencia` | #64 | README e documento de dificuldades e decisões atualizados com o deploy e a autenticação | 4.9 · documentação |
 | `docs/roteiro-demo-v3-login` | #65 | Roteiro da Demo v3 com acesso pela tela de login; suíte com 130 testes, 0 falhas (13/11) | 1.2 · 4.9 |
-| `docs/historico-versoes-horas` | este PR | Histórico de versões, tags `v0.1.0`/`v0.2.0`/`v1.0.0` e horas da Rodada 3 | 1.1 · 1.6 |
+| `docs/historico-versoes-horas` | #66 | Histórico de versões, tags `v0.1.0`/`v0.2.0`/`v1.0.0` e horas da Rodada 3 | 1.1 · 1.6 |
 
-Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → este PR.
+Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → #66.
 
 Convenção de commits mantida: `tipo(escopo): descrição #issue`. Nas Rodadas 1 e 2 o fluxo foi branch → PR → `develop` → `main`; na Rodada 3 as branches foram integradas direto na `main` por PR, com a `release/rodada3` concentrando as funcionalidades (ver `docs/adr/estrategia-branches.md`).
 

@@ -49,7 +49,7 @@
 | **4.9** | Tela de Login com Sessão para a Conta de Teste | `feature/tela-login` (#62) | Giovana | 20 h |
 | **4.1–4.3** | Testes do Relatório Mensal, do Perfil Demo e do Perfil H2 (17 testes novos; suíte com 130 testes) | `test/60-testes-relatorio-demo` (#61) | Enzo | 8 h |
 | **1.1 / 1.6** | Gestão de Branches, Resolução de Conflitos e Release v3 | `release/rodada3` (#58) | Arben | 20 h |
-| **1.1 / 1.6** | Tags de Versão (v0.1.0, v0.2.0, v1.0.0) e Histórico de Versões | `docs/historico-versoes-horas` | Arben | 12 h |
+| **1.1 / 1.6** | Tags de Versão (v0.1.0, v0.2.0, v1.0.0) e Histórico de Versões | `docs/historico-versoes-horas` (#66) | Arben | 12 h |
 | **1.6 / docs** | EVM Consolidado, Curva S, Burndowns e Documento PDF Final | `docs/consolidacao-final-gp` (#63) | Filipe | 38 h |
 | **1.2 / 1.6** | Correção da EAP (Árvore Única em Mermaid) | `feature/#24-correcao-eap` (#59) | Sara | 12 h |
 | **1.2 / 5.1** | Homologação de Critérios de Aceite e Roteiro da Demonstração v3 | `docs/roteiro-demo-v3-login` (#65) | Sara | 21 h |
