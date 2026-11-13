@@ -18,6 +18,8 @@ acompanhe metas de economia e visualize relatórios de seus gastos.
 | RF04 Metas | Metas de economia com valor alvo, prazo, progresso calculado a partir das transações e status | `/metas.html` · `/api/metas` |
 | RF05 Exportação | CSV das transações por período (abre direto no Excel pt-BR) | `/` · `GET /api/transacoes/exportar?de=&ate=` |
 
+**Versão publicada:** https://finapp-czqd.onrender.com/ · usuário `teste` · a senha foi enviada junto da entrega no Classroom. O serviço está no plano gratuito do Render e "dorme" após inatividade: a primeira abertura pode levar cerca de 1 minuto.
+
 Documentos da entrega final: [`docs/rodada3/`](docs/rodada3/). Publicação e conta de teste: [`docs/rodada3/deploy-conta-teste.md`](docs/rodada3/deploy-conta-teste.md).
 
 Veja o [Documento de Visão](docs/visao/README.md) e o [Plano de Projeto](docs/plano-projeto/README.md).

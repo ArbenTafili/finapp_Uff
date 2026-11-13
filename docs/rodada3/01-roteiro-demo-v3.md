@@ -27,7 +27,7 @@ Acesso: versão publicada com a conta de teste (ver [deploy-conta-teste.md](depl
 - Relatório carrega em menos de 3 s (RNF02): o tempo de cada carregamento aparece no console do navegador (`Relatório AAAA-MM carregado em N ms`).
 - Valores sempre com 2 casas e sem arredondamento implícito (RNF05): coberto por `CalculoFinanceiroTest`, `CalculoMetaTest` e `ExportacaoServiceTest`.
 - Compatível com Chrome, Firefox e Safari (RNF04). **Conferir manualmente nos três navegadores antes da gravação.**
-- Suíte automatizada verde: `./gradlew test` (exige Docker para o PostgreSQL dos testes; 109 testes na integração das branches).
+- Suíte automatizada verde: ./gradlew test (exige Docker para o PostgreSQL dos testes). Última execução em 13/11/2026, após o merge da tela de login: 130 testes, 0 falhas.
 
 ## Plano B
 
