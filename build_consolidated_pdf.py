@@ -529,9 +529,342 @@ def svg_burndowns():
     </div>
     """
 
+# Visao geral das tres entregas (capitulo 1). Os graficos sao desenhados a partir dos dados,
+# nao de coordenadas fixas: o burndown geral le as tabelas das secoes 3.1 a 3.3 de
+# docs/rodada3/04-monitoramento-consolidado.md, entao acompanha qualquer correcao nesses numeros.
+
+ANO_PROJETO = 2026
+
+# Uma linha por entrega. Fontes: horas de 05-registro-participacao-consolidado.md, SPI/CPI acumulados
+# de 04-monitoramento-consolidado.md (secao 1.1), tags de 02-historico-versoes.md e baseline do
+# cronograma da Rodada 1 (rodada1/05-cronograma-orcamento.md).
+ENTREGAS = [
+    {
+        "nome": "Rodada 1", "demo": "Demo v1", "cor": "#16a34a", "cor_texto": "#166534",
+        "inicio": "01/09", "fim": "14/09", "base_inicio": "01/09", "base_fim": "14/09",
+        "horas_prev": 120, "horas_real": 120, "spi": "1,00", "cpi": "1,00", "tags": "v0.1.0",
+        "secao_burndown": "### 3.1",
+        "entregou": "Visão do produto, escopo e EAP, papéis, estimativas (Planning Poker), cronograma e "
+                    "orçamento; CRUD de transações e categorias com interface web simples e Docker.",
+        "docs": ["rodada1/01-documento-visao.md", "rodada1/04-estimativas-planning-poker.md",
+                 "rodada1/10-decisoes-tecnicas.md"],
+    },
+    {
+        "nome": "Rodada 2", "demo": "Demo v2", "cor": "#d97706", "cor_texto": "#92400e",
+        "inicio": "15/09", "fim": "06/10", "base_inicio": "15/09", "base_fim": "13/10",
+        "horas_prev": 180, "horas_real": 190, "spi": "1,01", "cpi": "0,98", "tags": "v0.2.0",
+        "secao_burndown": "### 3.2",
+        "entregou": "RF01 e RF02 concluídos, PostgreSQL com Flyway (RDT-01), relatório mensal na API "
+                    "(RF03 parcial), backlog e EAP revisados, análise de riscos atualizada.",
+        "docs": ["rodada2/01-backlog.md", "rodada2/02-escopo-eap.md", "rodada2/analise-riscos-atualizada.md",
+                 "adr/RDT-01.md"],
+    },
+    {
+        "nome": "Rodada 3", "demo": "Demo v3", "cor": "#2563eb", "cor_texto": "#1e40af",
+        "inicio": "07/10", "fim": "28/10", "base_inicio": "14/10", "base_fim": "28/10",
+        "horas_prev": 312, "horas_real": 305, "spi": "1,00", "cpi": "0,995", "tags": "v1.0.0 / v1.0.1",
+        "secao_burndown": "### 3.3",
+        "entregou": "Interface do relatório (RF03), metas de economia (RF04), exportação CSV (RF05), gestão "
+                    "de categorias, deploy com conta de teste e tela de login, suíte com 130 testes, EVM e "
+                    "documentação consolidados.",
+        "docs": ["rodada3/01-roteiro-demo-v3.md", "rodada3/04-monitoramento-consolidado.md",
+                 "rodada3/02-historico-versoes.md", "rodada3/05-registro-participacao-consolidado.md"],
+    },
+]
+
+
+def _data(ddmm):
+    dia, mes = (int(p) for p in ddmm.split("/")[:2])
+    return datetime.date(ANO_PROJETO, mes, dia)
+
+
+def _ddmm(data):
+    return data.strftime("%d/%m")
+
+
+def _tabela_md(texto, titulo):
+    """Linhas (dicts) da primeira tabela Markdown depois do titulo indicado."""
+    inicio = texto.find(titulo)
+    if inicio < 0:
+        return []
+    linhas = []
+    for linha in texto[inicio:].splitlines()[1:]:
+        if linha.startswith("#"):
+            break
+        if linha.strip().startswith("|"):
+            linhas.append([c.strip().strip("*") for c in linha.strip().strip("|").split("|")])
+        elif linhas:
+            break
+    if len(linhas) < 3:
+        return []
+    cabecalho = linhas[0]
+    return [dict(zip(cabecalho, valores)) for valores in linhas[2:]]
+
+
+def _coluna(linha, *trechos):
+    """Valor da coluna cujo nome contem todos os trechos (ignora maiusculas)."""
+    for nome, valor in linha.items():
+        if all(t.lower() in nome.lower() for t in trechos):
+            return valor
+    raise KeyError(trechos)
+
+
+def dados_burndown_geral():
+    """Horas restantes do projeto inteiro em cada medicao das tres rodadas.
+
+    Restante do projeto = restante da rodada em curso + horas planejadas das rodadas seguintes.
+    """
+    texto = read_doc("rodada3/04-monitoramento-consolidado.md")
+    pontos = []
+    for i, entrega in enumerate(ENTREGAS):
+        depois = sum(e["horas_prev"] for e in ENTREGAS[i + 1:])
+        for linha in _tabela_md(texto, entrega["secao_burndown"]):
+            pontos.append((
+                _data(_coluna(linha, "data")),
+                depois + float(_coluna(linha, "restante", "planejado")),
+                depois + float(_coluna(linha, "restante", "real")),
+            ))
+    # a mesma data pode aparecer no fim de uma rodada e no inicio da outra
+    unicos = {}
+    for data, plan, real in pontos:
+        unicos.setdefault(data, (data, plan, real))
+    return sorted(unicos.values())
+
+
+def svg_burndown_geral():
+    pontos = dados_burndown_geral()
+    if not pontos:
+        print("Aviso: tabelas de burndown não encontradas em 04-monitoramento-consolidado.md")
+        return ""
+    total = sum(e["horas_prev"] for e in ENTREGAS)
+    larg, alt = 900, 420
+    esq, dir_, topo, base = 64, 24, 64, 352
+    d0, d1 = _data(ENTREGAS[0]["inicio"]), _data(ENTREGAS[-1]["fim"])
+    ymax = 100 * (int(total // 100) + 1)
+
+    def x(data):
+        return esq + (data - d0).days / (d1 - d0).days * (larg - esq - dir_)
+
+    def y(valor):
+        return base - valor / ymax * (base - topo)
+
+    partes = []
+    # faixas das rodadas
+    for e in ENTREGAS:
+        x0, x1 = x(_data(e["inicio"])), x(_data(e["fim"]) + datetime.timedelta(days=1))
+        x1 = min(x1, larg - dir_)
+        partes.append(f'<rect x="{x0:.1f}" y="{topo}" width="{x1 - x0:.1f}" height="{base - topo}" '
+                      f'fill="{e["cor"]}" fill-opacity="0.07" />')
+        meio = (x0 + x1) / 2
+        partes.append(f'<text x="{meio:.1f}" y="{topo - 30}" text-anchor="middle" font-size="13" '
+                      f'font-weight="700" fill="{e["cor_texto"]}">{e["nome"]} · {e["demo"]}</text>')
+        partes.append(f'<text x="{meio:.1f}" y="{topo - 13}" text-anchor="middle" font-size="11" fill="#475569">'
+                      f'{e["inicio"]} a {e["fim"]} · {e["horas_prev"]} h prev. / {e["horas_real"]} h reais</text>')
+    # grade e eixo y
+    for v in range(0, ymax + 1, 100):
+        partes.append(f'<line x1="{esq}" y1="{y(v):.1f}" x2="{larg - dir_}" y2="{y(v):.1f}" stroke="#e2e8f0" />')
+        partes.append(f'<text x="{esq - 8}" y="{y(v) + 4:.1f}" text-anchor="end" font-size="11" fill="#64748b">{v} h</text>')
+    partes.append(f'<text x="16" y="{(topo + base) / 2:.1f}" text-anchor="middle" font-size="11" fill="#475569" '
+                  f'transform="rotate(-90 16 {(topo + base) / 2:.1f})">Horas restantes do projeto</text>')
+    # eixo x: marca em cada medicao; rotulo so onde cabe, com prioridade para inicio e fim das rodadas
+    limites = {_data(e[k]) for e in ENTREGAS for k in ("inicio", "fim")}
+    rotulados = []
+    for data in sorted((d for d, _, _ in pontos), key=lambda d: (d not in limites, d)):
+        if all(abs(x(data) - x(outra)) >= 34 for outra in rotulados):
+            rotulados.append(data)
+    for data, _, _ in pontos:
+        partes.append(f'<line x1="{x(data):.1f}" y1="{base}" x2="{x(data):.1f}" y2="{base + 4}" stroke="#94a3b8" />')
+        if data in rotulados:
+            partes.append(f'<text x="{x(data):.1f}" y="{base + 17}" text-anchor="middle" font-size="10" '
+                          f'fill="#64748b">{_ddmm(data)}</text>')
+    # linhas planejado e realizado
+    planejado = " ".join(f"{x(d):.1f},{y(p):.1f}" for d, p, _ in pontos)
+    realizado = " ".join(f"{x(d):.1f},{y(r):.1f}" for d, _, r in pontos)
+    partes.append(f'<polyline points="{planejado}" fill="none" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,5" />')
+    partes.append(f'<polyline points="{realizado}" fill="none" stroke="#4f46e5" stroke-width="3" stroke-linejoin="round" />')
+    for d, _, r in pontos:
+        partes.append(f'<circle cx="{x(d):.1f}" cy="{y(r):.1f}" r="3.2" fill="#4f46e5" />')
+    # entregas (marcos)
+    for e in ENTREGAS:
+        fim = _data(e["fim"])
+        real = next(r for d, _, r in pontos if d == fim)
+        cx, cy = x(fim), y(real)
+        partes.append(f'<rect x="{cx - 7:.1f}" y="{cy - 7:.1f}" width="14" height="14" fill="{e["cor"]}" '
+                      f'stroke="#ffffff" stroke-width="2" transform="rotate(45 {cx:.1f} {cy:.1f})" />')
+        # ultimo marco fica no canto: rotulo curto a esquerda, rente ao eixo, abaixo da linha
+        if fim == d1:
+            ancora, dx, dy, rotulo = "end", -30, -6, f'{e["demo"]} · {_ddmm(fim)}'
+        else:
+            ancora, dx, dy, rotulo = "start", 10, -12, f'{e["demo"]} · {_ddmm(fim)} · {real:.0f} h'
+        partes.append(f'<text x="{cx + dx:.1f}" y="{cy + dy:.1f}" text-anchor="{ancora}" font-size="11" '
+                      f'font-weight="700" fill="{e["cor_texto"]}">{rotulo}</text>')
+    # legenda
+    ly = alt - 22
+    partes.append(
+        f'<g font-size="11" fill="#334155">'
+        f'<line x1="{esq}" y1="{ly}" x2="{esq + 28}" y2="{ly}" stroke="#4f46e5" stroke-width="3" />'
+        f'<text x="{esq + 36}" y="{ly + 4}">Realizado</text>'
+        f'<line x1="{esq + 120}" y1="{ly}" x2="{esq + 148}" y2="{ly}" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,5" />'
+        f'<text x="{esq + 156}" y="{ly + 4}">Planejado</text>'
+        f'<rect x="{esq + 246}" y="{ly - 5}" width="10" height="10" fill="#475569" transform="rotate(45 {esq + 251} {ly})" />'
+        f'<text x="{esq + 264}" y="{ly + 4}">Entrega (demo)</text>'
+        f'<text x="{larg - dir_}" y="{ly + 4}" text-anchor="end" fill="#64748b">'
+        f'Restante do projeto = restante da rodada + horas planejadas das rodadas seguintes</text>'
+        f'</g>'
+    )
+    return f"""
+    <div class="diagram-box">
+      <div class="diagram-title">Burndown Geral do Projeto — as Três Entregas ({total} h planejadas)</div>
+      <svg viewBox="0 0 {larg} {alt}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg"
+           font-family="'Segoe UI', -apple-system, 'Helvetica Neue', sans-serif">
+        {''.join(partes)}
+      </svg>
+    </div>
+    """
+
+
+def svg_horas_por_entrega():
+    larg, alt = 900, 300
+    esq, topo, base = 64, 30, 232
+    ymax = 100 * (max(max(e["horas_prev"], e["horas_real"]) for e in ENTREGAS) // 100 + 1)
+    grupo = (larg - esq - 24) / len(ENTREGAS)
+    barra = 70
+
+    def y(valor):
+        return base - valor / ymax * (base - topo)
+
+    partes = []
+    for v in range(0, ymax + 1, 50):
+        partes.append(f'<line x1="{esq}" y1="{y(v):.1f}" x2="{larg - 24}" y2="{y(v):.1f}" stroke="#e2e8f0" />')
+        partes.append(f'<text x="{esq - 8}" y="{y(v) + 4:.1f}" text-anchor="end" font-size="11" fill="#64748b">{v} h</text>')
+    for i, e in enumerate(ENTREGAS):
+        centro = esq + grupo * (i + 0.5)
+        for j, (valor, cor, rotulo) in enumerate(((e["horas_prev"], "#cbd5e1", "prev."),
+                                                  (e["horas_real"], e["cor"], "real"))):
+            bx = centro - barra - 4 + j * (barra + 8)
+            partes.append(f'<rect x="{bx:.1f}" y="{y(valor):.1f}" width="{barra}" height="{base - y(valor):.1f}" '
+                          f'rx="3" fill="{cor}" />')
+            partes.append(f'<text x="{bx + barra / 2:.1f}" y="{y(valor) - 6:.1f}" text-anchor="middle" font-size="12" '
+                          f'font-weight="700" fill="#1e293b">{valor} h</text>')
+            partes.append(f'<text x="{bx + barra / 2:.1f}" y="{base + 15}" text-anchor="middle" font-size="10" '
+                          f'fill="#64748b">{rotulo}</text>')
+        desvio = e["horas_real"] - e["horas_prev"]
+        sinal = f"+{desvio}" if desvio > 0 else (f"−{-desvio}" if desvio < 0 else "0")
+        partes.append(f'<text x="{centro:.1f}" y="{base + 35}" text-anchor="middle" font-size="13" font-weight="700" '
+                      f'fill="{e["cor_texto"]}">{e["nome"]} · {e["demo"]}</text>')
+        partes.append(f'<text x="{centro:.1f}" y="{base + 53}" text-anchor="middle" font-size="11" fill="#475569">'
+                      f'desvio {sinal} h · SPI {e["spi"]} · CPI {e["cpi"]} (acumulados)</text>')
+    return f"""
+    <div class="diagram-box">
+      <div class="diagram-title">Horas por Entrega — Previstas × Reais</div>
+      <svg viewBox="0 0 {larg} {alt}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg"
+           font-family="'Segoe UI', -apple-system, 'Helvetica Neue', sans-serif">
+        {''.join(partes)}
+      </svg>
+    </div>
+    """
+
+
+def svg_linha_do_tempo():
+    """Periodo de cada rodada no cronograma da Rodada 1 (baseline) e no realizado."""
+    larg, alt = 900, 210
+    esq, dir_ = 150, 24
+    datas = [_data(e[k]) for e in ENTREGAS for k in ("inicio", "fim", "base_inicio", "base_fim")]
+    d0, d1 = min(datas), max(datas)
+
+    def x(data):
+        return esq + (data - d0).days / (d1 - d0).days * (larg - esq - dir_)
+
+    faixas = (("Baseline (Rodada 1)", "base_inicio", "base_fim", 40), ("Realizado", "inicio", "fim", 104))
+    partes = []
+    for rotulo, k_ini, k_fim, ty in faixas:
+        partes.append(f'<text x="{esq - 12}" y="{ty + 22}" text-anchor="end" font-size="12" font-weight="700" '
+                      f'fill="#334155">{rotulo}</text>')
+        for e in ENTREGAS:
+            ini, fim = _data(e[k_ini]), _data(e[k_fim])
+            x0, x1 = x(ini), x(fim + datetime.timedelta(days=1)) - 2
+            x1 = min(x1, larg - dir_)
+            # baseline em tom claro com texto escuro; realizado em cor cheia com texto branco
+            opaco, texto = ("1", "#ffffff") if k_ini == "inicio" else ("0.3", e["cor_texto"])
+            partes.append(f'<rect x="{x0:.1f}" y="{ty}" width="{x1 - x0:.1f}" height="34" rx="4" '
+                          f'fill="{e["cor"]}" fill-opacity="{opaco}" />')
+            dias = (fim - ini).days + 1
+            partes.append(f'<text x="{(x0 + x1) / 2:.1f}" y="{ty + 15}" text-anchor="middle" font-size="11" '
+                          f'font-weight="700" fill="{texto}">{e["nome"]}</text>')
+            partes.append(f'<text x="{(x0 + x1) / 2:.1f}" y="{ty + 28}" text-anchor="middle" font-size="10" '
+                          f'fill="{texto}">{_ddmm(ini)} a {_ddmm(fim)} · {dias} dias</text>')
+    # eixo com as datas de fim (entregas)
+    marcas = sorted({_data(e[k]) for e in ENTREGAS for k in ("fim", "base_fim")} | {d0})
+    for data in marcas:
+        partes.append(f'<line x1="{x(data):.1f}" y1="150" x2="{x(data):.1f}" y2="156" stroke="#94a3b8" />')
+        partes.append(f'<text x="{x(data):.1f}" y="170" text-anchor="middle" font-size="10" fill="#64748b">{_ddmm(data)}</text>')
+    partes.append(f'<line x1="{esq}" y1="150" x2="{larg - dir_}" y2="150" stroke="#cbd5e1" />')
+    r2 = ENTREGAS[1]
+    antecipou = (_data(r2["base_fim"]) - _data(r2["fim"])).days
+    partes.append(f'<text x="{esq}" y="{alt - 14}" font-size="11" fill="#475569">A Rodada 2 terminou {antecipou} dias '
+                  f'antes da data da baseline ({r2["base_fim"]} → {r2["fim"]}); a Rodada 3 começou em seguida e manteve '
+                  f'a entrega final em {ENTREGAS[-1]["fim"]}.</text>')
+    return f"""
+    <div class="diagram-box">
+      <div class="diagram-title">Linha do Tempo das Entregas — Baseline × Realizado</div>
+      <svg viewBox="0 0 {larg} {alt}" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg"
+           font-family="'Segoe UI', -apple-system, 'Helvetica Neue', sans-serif">
+        {''.join(partes)}
+      </svg>
+    </div>
+    """
+
+
+def capitulo_visao_geral():
+    linhas = []
+    for e in ENTREGAS:
+        caps = sorted({capitulo_do_doc(d) for d in e["docs"]} - {None})
+        links = ", ".join(f'<a href="#cap-{n}">{n}</a>' for n in caps)
+        linhas.append(
+            f"<tr><td style=\"white-space:nowrap\"><strong>{e['nome']}</strong><br>{e['demo']}</td>"
+            f"<td style=\"white-space:nowrap\">{e['inicio']} a<br>{e['fim']}/{ANO_PROJETO}</td>"
+            f"<td>{e['entregou']}</td>"
+            f"<td style=\"text-align:center\">{e['horas_prev']} h / {e['horas_real']} h</td>"
+            f"<td style=\"text-align:center\">{e['spi']} / {e['cpi']}</td>"
+            f"<td style=\"text-align:center; white-space:nowrap\">"
+            + "<br>".join(f"<code>{t}</code>" for t in e["tags"].split(" / ")) + "</td>"
+            f"<td style=\"text-align:center\">{links}</td></tr>"
+        )
+    total_prev = sum(e["horas_prev"] for e in ENTREGAS)
+    total_real = sum(e["horas_real"] for e in ENTREGAS)
+    return f"""
+    <p>O projeto foi executado em três rodadas, cada uma encerrada com uma demonstração do produto.
+    A tabela resume o período, o que foi entregue e o esforço de cada uma; os gráficos mostram o
+    projeto inteiro numa mesma escala de tempo. Os números vêm dos capítulos de monitoramento (EVM e
+    burndown) e de registro de participação.</p>
+    <table>
+      <thead><tr><th>Entrega</th><th>Período</th><th>O que foi entregue</th><th>Horas prev. / reais</th>
+      <th>SPI / CPI acumulados</th><th>Tag no Git</th><th>Capítulos</th></tr></thead>
+      <tbody>
+        {''.join(linhas)}
+        <tr><td><strong>Total</strong></td><td>01/09 a 28/10/{ANO_PROJETO}</td><td>RF01 a RF05</td>
+        <td style="text-align:center"><strong>{total_prev} h / {total_real} h</strong></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+    {svg_burndown_geral()}
+    {svg_linha_do_tempo()}
+    {svg_horas_por_entrega()}
+    """
+
+
+def capitulo_do_doc(doc):
+    for numero, (_, _, docs, _) in enumerate(CAPITULOS, start=1):
+        if doc in docs:
+            return numero
+    return None
+
+
 # Capitulos do documento, na ordem de impressao. O sumario e a numeracao saem desta lista.
 # (titulo do capitulo, linha do sumario, documentos em docs/, grafico inserido antes do texto)
 CAPITULOS = [
+    ("Visão Geral das Entregas (Rodadas 1, 2 e 3)",
+     "Visão Geral das Três Entregas (Períodos, Escopo, Horas e Burndown Geral)",
+     [], capitulo_visao_geral),
     ("Documento de Visão e Requisitos",
      "Documento de Visão e Requisitos (RF01 a RF05 e RNF01 a RNF05)",
      ["rodada1/01-documento-visao.md"], None),
@@ -555,7 +888,7 @@ CAPITULOS = [
      ["rodada2/analise-riscos-atualizada.md"], None),
     ("Decisões Técnicas e Arquitetura (ADRs &amp; RDT-01)",
      "Decisões Técnicas e Arquitetura (ADR 001, ADR 002 e RDT-01 Docker/Postgres)",
-     ["rodada3/03-dificuldades-decisoes.md"], None),
+     ["rodada3/03-dificuldades-decisoes.md", "rodada1/10-decisoes-tecnicas.md", "adr/RDT-01.md"], None),
     ("Gerência de Configuração e Controle de Versões",
      "Gerência de Configuração, Branches e Auditoria do Repositório",
      ["plano-projeto/secao-8-controle-versoes.md"], None),
