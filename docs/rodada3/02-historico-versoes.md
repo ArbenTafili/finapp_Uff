@@ -1,6 +1,6 @@
 # Histórico de versões — FinApp (Rodada 3)
 
-Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da integração dos PRs #58 a #65 da Rodada 3). Os hashes e as tags permitem reproduzir cada versão com `git checkout <hash>` ou `git checkout <tag>`.
+Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da integração dos PRs #58 a #66 da Rodada 3; o merge do #67 é marcado pela tag `v1.0.1`). Os hashes e as tags permitem reproduzir cada versão com `git checkout <hash>` ou `git checkout <tag>`.
 
 ## Marcos do produto
 
@@ -9,6 +9,7 @@ Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da
 | Demo v1 | `v0.1.0` | Rodada 1 (início de set/2026) | `db71473` (merge do PR #9, `develop` → `main`, 07/09) | CRUD de transações e categorias, interface web simples, Docker |
 | Demo v2 | `v0.2.0` | Rodada 2 (início de out/2026) | `7c96a25` (merge #55, 06/10) | RF01 e RF02 concluídos, Flyway/PostgreSQL, relatório mensal na API (RF03 parcial) |
 | Demo v3 / final | `v1.0.0` | Rodada 3 (nov/2026) | Merge do PR #66 (este histórico) na `main` (13/11) | RF03 interface, RF04 metas, RF05 exportação CSV, gestão de categorias, deploy com conta de teste, tela de login (#62), testes ampliados (#61, suíte com 130 testes) e EAP revisada (#59) |
+| Final, documentação revisada | `v1.0.1` | Rodada 3 (nov/2026) | Merge do PR #67 na `main` (13/11) | Mesmo código da `v1.0.0`; PDF consolidado gerado de novo com o histórico de versões e as horas atualizados, e script do PDF para macOS, Windows e Linux |
 
 O código da Demo v1 entrou na `develop` pelo PR #2 (`d9e37a2`, 05/09) e chegou à `main` no merge do PR #9 (`db71473`). O código-fonte dos dois commits é idêntico; a tag `v0.1.0` fica no commit da `main`.
 
@@ -21,9 +22,14 @@ git tag -a v0.1.0 db71473 -m "Demo v1 - Rodada 1"
 git tag -a v0.2.0 7c96a25 -m "Demo v2 - Rodada 2"
 git tag -a v1.0.0 origin/main -m "Entrega final - Demo v3 - Rodada 3"   # merge do PR #66
 git push origin v0.1.0 v0.2.0 v1.0.0
+
+git tag -a v1.0.1 origin/main -m "Entrega final - PDF consolidado atualizado"   # merge do PR #67
+git push origin v1.0.1
 ```
 
-Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.0` mostra o commit da entrega final.
+A `v1.0.1` é uma revisão de patch: não muda o código da aplicação, só o PDF consolidado e o script que o gera. A tag `v1.0.0` continua no merge do #66, sem ser movida.
+
+Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.1` mostra o commit da versão final mais recente.
 
 ## Branches da Rodada 3
 
@@ -43,8 +49,9 @@ Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.0` mostr
 | `docs/rodada3-conferencia` | #64 | README e documento de dificuldades e decisões atualizados com o deploy e a autenticação | 4.9 · documentação |
 | `docs/roteiro-demo-v3-login` | #65 | Roteiro da Demo v3 com acesso pela tela de login; suíte com 130 testes, 0 falhas (13/11) | 1.2 · 4.9 |
 | `docs/historico-versoes-horas` | #66 | Histórico de versões, tags `v0.1.0`/`v0.2.0`/`v1.0.0` e horas da Rodada 3 | 1.1 · 1.6 |
+| `docs/pdf-consolidado-multiplataforma` | #67 | Script do PDF consolidado para macOS, Windows e Linux, PDF gerado de novo e tag `v1.0.1` | 1.6 |
 
-Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → #66.
+Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → #66 → #67.
 
 Convenção de commits mantida: `tipo(escopo): descrição #issue`. Nas Rodadas 1 e 2 o fluxo foi branch → PR → `develop` → `main`; na Rodada 3 as branches foram integradas direto na `main` por PR, com a `release/rodada3` concentrando as funcionalidades (ver `docs/adr/estrategia-branches.md`).
 
@@ -52,6 +59,7 @@ Convenção de commits mantida: `tipo(escopo): descrição #issue`. Nas Rodadas 
 
 | Commit | Data | Autor | Mensagem |
 |---|---|---|---|
+| `47ed64c` · **v1.0.0** | 2026-11-13 | Arben | docs: histórico de versões (PRs #58 a #65), tags e horas da Rodada 3 (#66) |
 | `68b32ef` | 2026-11-13 | Sara | docs(demo): atualiza roteiro da Demo v3 (#65) |
 | `5587a38` | 2026-11-13 | Giovana | docs: update README and difficulties document with deployment details and authentication changes (#64) |
 | `0b77b4d` | 2026-11-13 | Filipe | docs(gestao): consolidacao final da Rodada 3 (EVM, burndown acumulado, graficos e PDF master) (#63) |
