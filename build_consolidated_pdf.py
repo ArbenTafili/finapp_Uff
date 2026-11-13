@@ -1,27 +1,58 @@
 # -*- coding: utf-8 -*-
 """
-Script de Geracao do Documento Consolidado do Projeto FinApp em PDF
-Consolida todos os documentos tecnicos e de gestao das Rodadas 1, 2 e 3.
-Gera graficos vetoriais SVG integrados (EAP, Gantt com prazos/atrasos, Curva S, Burndowns).
-Converte para PDF executivo via Microsoft Edge Headless.
+Gera o Documento Consolidado do Projeto FinApp em PDF.
+
+Junta os documentos técnicos e de gestão das Rodadas 1, 2 e 3 (Markdown em docs/),
+acrescenta os gráficos vetoriais (EAP, Gantt, Curva S e burndowns) e imprime o
+resultado em PDF com um navegador baseado em Chromium em modo headless
+(Google Chrome, Microsoft Edge, Chromium ou Brave) no macOS, no Windows ou no Linux.
+
+Uso (Python 3.10 ou superior):
+    python3 -m pip install markdown
+    python3 build_consolidated_pdf.py
+    python3 build_consolidated_pdf.py --data 13/11/2026
+    python3 build_consolidated_pdf.py --navegador "/caminho/do/navegador"
+
+No Windows, use "py" no lugar de "python3". O navegador também pode ser indicado
+pela variável de ambiente PDF_BROWSER.
+
+Saídas: FinApp_Documento_Consolidado_Final.pdf (na raiz e em docs/) e o HTML
+intermediário Documento_Consolidado_FinApp.html (ignorado pelo Git), útil para
+conferir o layout no navegador antes de gerar o PDF.
 """
 
+import argparse
+import datetime
 import os
+import platform
+import posixpath
+import re
+import shutil
 import subprocess
-import markdown
+import sys
+import tempfile
+from pathlib import Path
+
+try:
+    import markdown
+except ImportError:
+    sys.exit("Falta o pacote 'markdown'. Instale com: python3 -m pip install markdown")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOCS_DIR = os.path.join(BASE_DIR, "docs")
 OUTPUT_HTML = os.path.join(BASE_DIR, "Documento_Consolidado_FinApp.html")
 OUTPUT_PDF = os.path.join(BASE_DIR, "FinApp_Documento_Consolidado_Final.pdf")
 OUTPUT_PDF_DOCS = os.path.join(DOCS_DIR, "FinApp_Documento_Consolidado_Final.pdf")
+REPO_URL = "https://github.com/ArbenTafili/finapp_Uff"
 
 def read_doc(rel_path):
     full_path = os.path.join(DOCS_DIR, rel_path)
-    if os.path.exists(full_path):
-        with open(full_path, "r", encoding="utf-8") as f:
-            return f.read()
-    return ""
+    if not os.path.exists(full_path):
+        print(f"Aviso: docs/{rel_path} não encontrado; o capítulo ficará sem esse texto.")
+        return ""
+    with open(full_path, "r", encoding="utf-8") as f:
+        return f.read()
+
 
 # Geradores de SVG de alta precisao e visual moderno
 
@@ -498,77 +529,158 @@ def svg_burndowns():
     </div>
     """
 
-def build_html():
-    print("Carregando e integrando documentos...")
-    
-    # Textos dos arquivos originais
-    doc_visao = read_doc("rodada1/01-documento-visao.md")
-    doc_eap_r2 = read_doc("rodada2/02-escopo-eap.md")
-    doc_backlog = read_doc("rodada2/01-backlog.md")
-    doc_poker = read_doc("rodada1/04-estimativas-planning-poker.md")
-    doc_gantt_orc = read_doc("plano-projeto/secao-5-cronograma-orcamento.md")
-    doc_monit = read_doc("rodada3/04-monitoramento-consolidado.md")
-    doc_riscos = read_doc("rodada2/analise-riscos-atualizada.md")
-    doc_versoes = read_doc("plano-projeto/secao-8-controle-versoes.md")
-    doc_historico = read_doc("rodada3/02-historico-versoes.md")
-    doc_decisoes = read_doc("rodada3/03-dificuldades-decisoes.md")
-    doc_demo_v3 = read_doc("rodada3/01-roteiro-demo-v3.md")
-    doc_deploy = read_doc("rodada3/deploy-conta-teste.md")
-    doc_partic = read_doc("rodada3/05-registro-participacao-consolidado.md")
-    doc_retro = read_doc("rodada3/06-retrospectiva-final.md")
+# Capitulos do documento, na ordem de impressao. O sumario e a numeracao saem desta lista.
+# (titulo do capitulo, linha do sumario, documentos em docs/, grafico inserido antes do texto)
+CAPITULOS = [
+    ("Documento de Visão e Requisitos",
+     "Documento de Visão e Requisitos (RF01 a RF05 e RNF01 a RNF05)",
+     ["rodada1/01-documento-visao.md"], None),
+    ("Backlog do Produto e Priorização",
+     "Backlog do Produto e User Stories Refinadas",
+     ["rodada2/01-backlog.md"], None),
+    ("Escopo do Projeto e Estrutura Analítica (EAP)",
+     "Escopo do Projeto e Diagrama Hierárquico da EAP (WBS)",
+     ["rodada2/02-escopo-eap.md"], svg_eap_diagram),
+    ("Estimativas de Esforço (Planning Poker)",
+     "Estimativas de Esforço (Planning Poker e Story Points)",
+     ["rodada1/04-estimativas-planning-poker.md"], None),
+    ("Cronograma Detalhado e Linha do Tempo (Gantt)",
+     "Cronograma Detalhado (Gantt) com Análise de Prazos e Atrasos",
+     ["plano-projeto/secao-5-cronograma-orcamento.md"], svg_gantt_diagram),
+    ("Monitoramento e Controle (EVM, Curva S e Burndowns)",
+     "Monitoramento e Controle (EVM Acumulado, Curva S, Burndowns e Orçamento por EAP e por Membro)",
+     ["rodada3/04-monitoramento-consolidado.md"], lambda: svg_curva_s() + svg_burndowns()),
+    ("Gestão e Análise de Riscos",
+     "Gestão de Riscos (Matriz de Riscos e Planos de Mitigação)",
+     ["rodada2/analise-riscos-atualizada.md"], None),
+    ("Decisões Técnicas e Arquitetura (ADRs &amp; RDT-01)",
+     "Decisões Técnicas e Arquitetura (ADR 001, ADR 002 e RDT-01 Docker/Postgres)",
+     ["rodada3/03-dificuldades-decisoes.md"], None),
+    ("Gerência de Configuração e Controle de Versões",
+     "Gerência de Configuração, Branches e Auditoria do Repositório",
+     ["plano-projeto/secao-8-controle-versoes.md"], None),
+    ("Histórico de Versões e Entregas",
+     "Histórico de Versões, Tags e Integração das Entregas Técnicas",
+     ["rodada3/02-historico-versoes.md"], None),
+    ("Demonstração do Produto (Demo v3) e Deploy Cloud",
+     "Roteiro da Demonstração v3, Publicação em Nuvem e Conta de Teste",
+     ["rodada3/01-roteiro-demo-v3.md", "rodada3/deploy-conta-teste.md"], None),
+    ("Registro de Participação Individual e Esforço",
+     "Registro de Participação Individual e Esforço Consolidado (Horas e Commits)",
+     ["rodada3/05-registro-participacao-consolidado.md"], None),
+    ("Retrospectiva Final e Encerramento",
+     "Retrospectiva Final (Roteiro em Vídeo, Lições Aprendidas e Conclusão)",
+     ["rodada3/06-retrospectiva-final.md"], None),
+]
 
-    md = markdown.Markdown(extensions=['tables', 'fenced_code', 'toc'])
+# Linha que comeca lista ou tabela em Markdown
+INICIO_LISTA_OU_TABELA = re.compile(r"\s*([-*+] |\d+[.)] |\|)")
+TITULO_MD = re.compile(r"^(#{1,5})(\s)")
 
-    def render_md(text):
-        # Remove eventuais blocos mermaid de texto puro ja que vamos injetar os vetores SVG
-        lines = []
-        skip_mermaid = False
-        for line in text.splitlines():
-            if line.strip().startswith("```mermaid"):
-                skip_mermaid = True
-                continue
-            elif skip_mermaid and line.strip().startswith("```"):
-                skip_mermaid = False
-                continue
-            elif not skip_mermaid:
-                lines.append(line)
-        return md.convert("\n".join(lines))
 
-    html_content = f"""<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>FinApp — Documento Consolidado do Projeto</title>
-  <style>
-    @page {{
+def _paragrafo(linha):
+    """Linha de texto corrido (nao e titulo, lista, tabela, citacao, codigo nem HTML)."""
+    texto = linha.strip()
+    return (bool(texto) and linha[:1] not in " \t"
+            and not re.match(r"([-*+] |\d+[.)] |\||#|>|```|<)", texto))
+
+
+def preparar_markdown(texto):
+    """Ajusta o Markdown dos docs para o Python-Markdown renderizar como o GitHub.
+
+    - Remove os blocos Mermaid: os graficos sao desenhados pelos SVGs deste script.
+    - Insere linha em branco antes de lista ou tabela colada num paragrafo
+      (o GitHub aceita, o Python-Markdown juntaria tudo num paragrafo so).
+    - Desce os titulos um nivel: o h1 do documento e o titulo do capitulo.
+    """
+    saida, em_mermaid, em_codigo = [], False, False
+    for linha in texto.splitlines():
+        marca = linha.strip()
+        if em_mermaid:
+            em_mermaid = not marca.startswith("```")
+            continue
+        if marca.startswith("```mermaid"):
+            em_mermaid = True
+            continue
+        if marca.startswith("```"):
+            em_codigo = not em_codigo
+        elif not em_codigo:
+            if saida and INICIO_LISTA_OU_TABELA.match(linha) and _paragrafo(saida[-1]):
+                saida.append("")
+            linha = TITULO_MD.sub(r"#\1\2", linha)
+        saida.append(linha)
+    return "\n".join(saida)
+
+
+def ajustar_links(html, doc_rel, ancoras):
+    """Links relativos entre documentos viram links internos do PDF (capitulo) ou do GitHub."""
+    base = posixpath.join("docs", posixpath.dirname(doc_rel))
+
+    def trocar(m):
+        href = m.group(1)
+        if not href or href.startswith("#") or re.match(r"[a-zA-Z][a-zA-Z0-9+.-]*:", href):
+            return m.group(0)
+        caminho, _, fragmento = href.partition("#")
+        alvo = posixpath.normpath(posixpath.join(base, caminho))
+        if alvo in ancoras:
+            return f'href="#{ancoras[alvo]}"'
+        return f'href="{REPO_URL}/blob/main/{alvo}' + (f"#{fragmento}" if fragmento else "") + '"'
+
+    return re.sub(r'href="([^"]*)"', trocar, html)
+
+
+def montar_capitulos():
+    ancoras = {}
+    for numero, (_, _, docs, _) in enumerate(CAPITULOS, start=1):
+        for doc in docs:
+            ancoras.setdefault(posixpath.join("docs", doc), f"cap-{numero}")
+
+    md = markdown.Markdown(extensions=["tables", "fenced_code", "toc", "sane_lists", "nl2br"])
+    sumario, corpo = [], []
+    for numero, (titulo, linha_sumario, docs, grafico) in enumerate(CAPITULOS, start=1):
+        sumario.append(f'<li><a href="#cap-{numero}"><strong>Seção {numero}.</strong> {linha_sumario}</a></li>')
+        partes = [grafico()] if grafico else []
+        for doc in docs:
+            md.reset()
+            html = ajustar_links(md.convert(preparar_markdown(read_doc(doc))), doc, ancoras)
+            partes.append(html.replace("R$ ", "R$&nbsp;"))  # valor em reais nao quebra de linha
+        corpo.append(
+            f'  <div class="chapter" id="cap-{numero}">\n'
+            f'    <h1>{numero}. {titulo}</h1>\n' + "\n".join(partes) + "\n  </div>"
+        )
+    return "\n        ".join(sumario), "\n\n".join(corpo)
+
+
+CSS = """
+    @page {
       size: A4;
       margin: 20mm 15mm 20mm 15mm;
-      @bottom-right {{
+      @bottom-right {
         content: counter(page);
-        font-family: 'Segoe UI', sans-serif;
+        font-family: 'Segoe UI', -apple-system, 'Helvetica Neue', sans-serif;
         font-size: 9pt;
         color: #64748b;
-      }}
-      @bottom-left {{
+      }
+      @bottom-left {
         content: "FinApp — Projeto de Gerência de Projetos (UFF)";
-        font-family: 'Segoe UI', sans-serif;
+        font-family: 'Segoe UI', -apple-system, 'Helvetica Neue', sans-serif;
         font-size: 9pt;
         color: #64748b;
-      }}
-    }}
+      }
+    }
 
-    body {{
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Roboto, Helvetica, Arial, sans-serif;
       color: #1e293b;
       line-height: 1.55;
       font-size: 10.5pt;
       background: #ffffff;
       margin: 0;
       padding: 0;
-    }}
+    }
 
     /* Capa Executiva */
-    .cover-page {{
+    .cover-page {
       page-break-after: always;
       height: 92vh;
       display: flex;
@@ -578,43 +690,50 @@ def build_html():
       padding: 40px;
       box-sizing: border-box;
       background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
-    }}
-    .cover-header {{
+    }
+    .cover-header {
       text-align: center;
       border-bottom: 2px solid #cbd5e1;
       padding-bottom: 20px;
-    }}
-    .cover-header h3 {{
+    }
+    /* A capa usa div em vez de h1-h4 para nao entrar nos marcadores do PDF */
+    .cover-instituicao {
       margin: 0;
       color: #475569;
       font-size: 13pt;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-    }}
-    .cover-header h4 {{
+    }
+    .cover-subtitulo {
       margin: 5px 0 0 0;
       color: #64748b;
       font-size: 11pt;
       font-weight: 500;
-    }}
-    .cover-title-box {{
+    }
+    .cover-title-box {
       text-align: center;
       margin: auto 0;
-    }}
-    .cover-title-box h1 {{
+    }
+    .cover-titulo {
       font-size: 28pt;
+      line-height: 1.3;
       color: #1e3a8a;
       margin: 0 0 10px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
       font-weight: 800;
       letter-spacing: -0.5px;
-    }}
-    .cover-title-box h2 {{
+    }
+    .cover-descricao {
       font-size: 15pt;
       color: #0d9488;
       margin: 0 0 20px 0;
+      padding-left: 8px;
+      border-left: 4px solid #0d9488;
       font-weight: 600;
-    }}
-    .cover-badge {{
+    }
+    .cover-badge {
       display: inline-block;
       background: #1e3a8a;
       color: #ffffff;
@@ -624,31 +743,32 @@ def build_html():
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-    }}
-    .cover-footer {{
+    }
+    .cover-footer {
       border-top: 2px solid #cbd5e1;
       padding-top: 20px;
       display: flex;
       justify-content: space-between;
-      font-size: 10pt;
-    }}
-    .cover-team {{
+      gap: 16px;
+      font-size: 9.5pt;
+    }
+    .cover-team {
       line-height: 1.6;
-    }}
-    .cover-team strong {{
+    }
+    .cover-team strong {
       color: #1e3a8a;
-    }}
+    }
 
     /* Estrutura de Capitulos */
-    .chapter {{
+    .chapter {
       page-break-before: always;
       margin-top: 10px;
-    }}
-    .chapter:first-of-type {{
+    }
+    .chapter:first-of-type {
       page-break-before: avoid;
-    }}
+    }
 
-    h1 {{
+    h1 {
       color: #1e3a8a;
       font-size: 18pt;
       border-bottom: 2px solid #e2e8f0;
@@ -656,8 +776,8 @@ def build_html():
       margin-top: 20px;
       margin-bottom: 15px;
       font-weight: 700;
-    }}
-    h2 {{
+    }
+    h2 {
       color: #0f766e;
       font-size: 13.5pt;
       margin-top: 18px;
@@ -665,48 +785,70 @@ def build_html():
       font-weight: 600;
       border-left: 4px solid #0d9488;
       padding-left: 8px;
-    }}
-    h3 {{
+    }
+    h3 {
       color: #334155;
       font-size: 11.5pt;
       margin-top: 14px;
       margin-bottom: 6px;
       font-weight: 600;
-    }}
+    }
+    h4, h5, h6 {
+      color: #475569;
+      font-size: 10.5pt;
+      margin-top: 12px;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    /* Titulo nunca fica sozinho no fim da pagina */
+    h1, h2, h3, h4, h5, h6 {
+      break-after: avoid;
+    }
 
-    p, ul, ol {{
+    a {
+      color: #1d4ed8;
+      text-decoration: none;
+    }
+
+    p, ul, ol {
       margin-top: 0;
       margin-bottom: 10px;
       text-align: justify;
-    }}
+    }
 
     /* Tabelas */
-    table {{
+    table {
       width: 100%;
       border-collapse: collapse;
       margin: 14px 0;
       font-size: 9pt;
-      page-break-inside: avoid;
-    }}
-    th {{
+    }
+    /* Tabela longa pode continuar na pagina seguinte, mas sem partir linhas; o cabecalho se repete */
+    thead {
+      display: table-header-group;
+    }
+    tr {
+      break-inside: avoid;
+    }
+    th {
       background-color: #1e3a8a;
       color: #ffffff;
       text-align: left;
       padding: 7px 9px;
       font-weight: 600;
       border: 1px solid #1e3a8a;
-    }}
-    td {{
+    }
+    td {
       padding: 6px 9px;
       border: 1px solid #cbd5e1;
       vertical-align: middle;
-    }}
-    tr:nth-child(even) {{
+    }
+    tr:nth-child(even) {
       background-color: #f8fafc;
-    }}
+    }
 
     /* Caixas de Destaque e Diagramas */
-    .diagram-box {{
+    .diagram-box {
       border: 1px solid #cbd5e1;
       background: #ffffff;
       border-radius: 8px;
@@ -714,8 +856,8 @@ def build_html():
       margin: 18px 0;
       page-break-inside: avoid;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }}
-    .diagram-title {{
+    }
+    .diagram-title {
       font-size: 11pt;
       font-weight: 700;
       color: #1e3a8a;
@@ -723,26 +865,26 @@ def build_html():
       margin-bottom: 12px;
       border-bottom: 1px solid #f1f5f9;
       padding-bottom: 6px;
-    }}
+    }
 
-    blockquote {{
+    blockquote {
       background: #f0fdf4;
       border-left: 4px solid #10b981;
       margin: 12px 0;
       padding: 8px 14px;
       color: #166534;
       font-size: 9.5pt;
-    }}
+    }
 
-    code {{
+    code {
       background-color: #f1f5f9;
       padding: 2px 5px;
       border-radius: 4px;
-      font-family: 'Consolas', 'Courier New', monospace;
+      font-family: 'SF Mono', Menlo, Consolas, 'Courier New', monospace;
       font-size: 9pt;
       color: #0f172a;
-    }}
-    pre {{
+    }
+    pre {
       background-color: #0f172a;
       color: #f8fafc;
       padding: 10px;
@@ -750,46 +892,58 @@ def build_html():
       overflow-x: auto;
       font-size: 8.5pt;
       page-break-inside: avoid;
-    }}
+    }
 
     /* Sumario */
-    .toc-box {{
+    .toc-box {
       background: #f8fafc;
       border: 1px solid #e2e8f0;
       border-radius: 8px;
       padding: 20px 30px;
       margin: 20px 0;
-    }}
-    .toc-box ul {{
+    }
+    .toc-box ul {
       list-style-type: none;
       padding-left: 0;
       margin-bottom: 0;
-    }}
-    .toc-box li {{
+    }
+    .toc-box li {
       padding: 5px 0;
       border-bottom: 1px dotted #cbd5e1;
       font-size: 10.5pt;
-    }}
-    .toc-box li a {{
+    }
+    .toc-box li a {
       text-decoration: none;
       color: #1e3a8a;
       font-weight: 600;
-    }}
-  </style>
+    }
+  """
+
+
+def build_html(data_consolidacao):
+    print("Carregando e integrando documentos...")
+    sumario, capitulos = montar_capitulos()
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>FinApp — Documento Consolidado do Projeto</title>
+  <style>{CSS}</style>
 </head>
 <body>
 
   <!-- CAPA -->
   <div class="cover-page">
     <div class="cover-header">
-      <h3>Universidade Federal Fluminense — UFF</h3>
-      <h4>Instituto de Computação · Gerência de Projetos e Manutenção de Software (GPMS)</h4>
-      <h4>Professora: Rebeca Campos Motta · Semestre 2026.2</h4>
+      <div class="cover-instituicao">Universidade Federal Fluminense — UFF</div>
+      <div class="cover-subtitulo">Instituto de Computação · Gerência de Projetos e Manutenção de Software (GPMS)</div>
+      <div class="cover-subtitulo">Professora: Rebeca Campos Motta · Semestre 2026.2</div>
     </div>
 
     <div class="cover-title-box">
-      <h1>FinApp — Gestão Financeira Pessoal</h1>
-      <h2>Plano de Projeto Consolidado e Relatório de Encerramento</h2>
+      <div class="cover-titulo">FinApp — Gestão Financeira Pessoal</div>
+      <div class="cover-descricao">Plano de Projeto Consolidado e Relatório de Encerramento</div>
       <div class="cover-badge">Entrega Final · Rodadas 1, 2 e 3 Integradas</div>
     </div>
 
@@ -804,119 +958,25 @@ def build_html():
         • <strong>Giovana</strong> — Desenvolvedora (Backend/Frontend)
       </div>
       <div style="text-align: right; line-height: 1.6;">
-        <strong>Data de Consolidação:</strong> 28/10/2026<br>
+        <strong>Data de Consolidação:</strong> {data_consolidacao}<br>
         <strong>Status:</strong> 100% Entregue &amp; Homologado<br>
         <strong>Baseline Global:</strong> 153 SP · 612 h · R$ 30.600<br>
-        <strong>Repositório:</strong> GitHub (main branch)
+        <strong>Repositório:</strong> <a href="{REPO_URL}">GitHub (branch main)</a>
       </div>
     </div>
   </div>
 
-  <!-- SUMARIO -->
+  <!-- SUMARIO (gerado a partir de CAPITULOS) -->
   <div class="chapter">
     <h1>Sumário Executivo do Projeto</h1>
     <div class="toc-box">
       <ul>
-        <li><strong>Seção 1.</strong> Documento de Visão e Requisitos (RF01 a RF05 e RNF01 a RNF05)</li>
-        <li><strong>Seção 2.</strong> Backlog do Produto e User Stories Refinadas</li>
-        <li><strong>Seção 3.</strong> Escopo do Projeto e Diagrama Hierárquico da EAP (WBS)</li>
-        <li><strong>Seção 4.</strong> Estimativas de Esforço (Planning Poker e Story Points)</li>
-        <li><strong>Seção 5.</strong> Cronograma Detalhado (Gantt) com Análise de Prazos e Atrasos</li>
-        <li><strong>Seção 6.</strong> Detalhamento Completo do Orçamento (Por EAP e Por Membro)</li>
-        <li><strong>Seção 7.</strong> Monitoramento e Controle (EVM Acumulado, Curva S e Burndowns)</li>
-        <li><strong>Seção 8.</strong> Gestão de Riscos (Matriz de Riscos e Planos de Mitigação)</li>
-        <li><strong>Seção 9.</strong> Decisões Técnicas e Arquitetura (ADR 001, ADR 002 e RDT-01 Docker/Postgres)</li>
-        <li><strong>Seção 10.</strong> Gerência de Configuração, Branches e Auditoria do Repositório</li>
-        <li><strong>Seção 11.</strong> Histórico de Versões e Integração das Entregas Técnicas</li>
-        <li><strong>Seção 12.</strong> Roteiro da Demonstração v3, Publicação em Nuvem e Conta de Teste</li>
-        <li><strong>Seção 13.</strong> Registro de Participação Individual e Esforço Consolidado (Horas e Commits)</li>
-        <li><strong>Seção 14.</strong> Retrospectiva Final (Roteiro em Vídeo, Lições Aprendidas e Conclusão)</li>
+        {sumario}
       </ul>
     </div>
   </div>
 
-  <!-- SECAO 1: VISAO -->
-  <div class="chapter">
-    <h1>1. Documento de Visão e Requisitos</h1>
-    {render_md(doc_visao)}
-  </div>
-
-  <!-- SECAO 2: BACKLOG -->
-  <div class="chapter">
-    <h1>2. Backlog do Produto e Priorização</h1>
-    {render_md(doc_backlog)}
-  </div>
-
-  <!-- SECAO 3: EAP & DIAGRAMA -->
-  <div class="chapter">
-    <h1>3. Escopo do Projeto e Estrutura Analítica (EAP)</h1>
-    {svg_eap_diagram()}
-    {render_md(doc_eap_r2)}
-  </div>
-
-  <!-- SECAO 4: PLANNING POKER -->
-  <div class="chapter">
-    <h1>4. Estimativas de Esforço (Planning Poker)</h1>
-    {render_md(doc_poker)}
-  </div>
-
-  <!-- SECAO 5: CRONOGRAMA & GANTT -->
-  <div class="chapter">
-    <h1>5. Cronograma Detalhado e Linha do Tempo (Gantt)</h1>
-    {svg_gantt_diagram()}
-    {render_md(doc_gantt_orc)}
-  </div>
-
-  <!-- SECAO 7: MONITORAMENTO, EVM, CURVA S E BURNDOWNS -->
-  <div class="chapter">
-    <h1>6. Monitoramento e Controle (EVM, Curva S e Burndowns)</h1>
-    {svg_curva_s()}
-    {svg_burndowns()}
-    {render_md(doc_monit)}
-  </div>
-
-  <!-- SECAO 8: RISCOS -->
-  <div class="chapter">
-    <h1>7. Gestão e Análise de Riscos</h1>
-    {render_md(doc_riscos)}
-  </div>
-
-  <!-- SECAO 9: DECISOES TECNICAS -->
-  <div class="chapter">
-    <h1>8. Decisões Técnicas e Arquitetura (ADRs &amp; RDT-01)</h1>
-    {render_md(doc_decisoes)}
-  </div>
-
-  <!-- SECAO 10: CONFIGURACAO E BRANCHES -->
-  <div class="chapter">
-    <h1>9. Gerência de Configuração e Controle de Versões</h1>
-    {render_md(doc_versoes)}
-  </div>
-
-  <!-- SECAO 11: HISTORICO DE VERSOES -->
-  <div class="chapter">
-    <h1>10. Histórico de Versões e Entregas</h1>
-    {render_md(doc_historico)}
-  </div>
-
-  <!-- SECAO 12: DEMO V3 E DEPLOY -->
-  <div class="chapter">
-    <h1>11. Demonstração do Produto (Demo v3) e Deploy Cloud</h1>
-    {render_md(doc_demo_v3)}
-    {render_md(doc_deploy)}
-  </div>
-
-  <!-- SECAO 13: REGISTRO DE PARTICIPACAO -->
-  <div class="chapter">
-    <h1>12. Registro de Participação Individual e Esforço</h1>
-    {render_md(doc_partic)}
-  </div>
-
-  <!-- SECAO 14: RETROSPECTIVA FINAL -->
-  <div class="chapter">
-    <h1>13. Retrospectiva Final e Encerramento</h1>
-    {render_md(doc_retro)}
-  </div>
+{capitulos}
 
 </body>
 </html>
@@ -924,35 +984,100 @@ def build_html():
 
     with open(OUTPUT_HTML, "w", encoding="utf-8") as f:
         f.write(html_content)
-    print(f"HTML Consolidado gerado em: {OUTPUT_HTML}")
+    print(f"HTML consolidado gerado em: {OUTPUT_HTML}")
 
-    # Geracao do PDF via Microsoft Edge Headless
-    edge_path = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-    if not os.path.exists(edge_path):
-        edge_path = r"C:\Program Files\Microsoft\Edge\Application\msedge.exe"
 
-    print("Gerando PDF via Microsoft Edge Headless...")
-    cmd = [
-        edge_path,
-        "--headless",
-        "--disable-gpu",
-        "--run-all-compositor-stages-before-draw",
-        f"--print-to-pdf={OUTPUT_PDF}",
-        f"file:///{OUTPUT_HTML.replace(os.sep, '/')}"
-    ]
+def encontrar_navegador(indicado=None):
+    """Procura um navegador Chromium (Chrome, Edge, Chromium ou Brave) instalado."""
+    indicado = indicado or os.environ.get("PDF_BROWSER")
+    if indicado:
+        caminho = indicado if os.path.isfile(indicado) else shutil.which(indicado)
+        if not caminho:
+            sys.exit(f"Navegador indicado não encontrado: {indicado}")
+        return caminho
 
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    if os.path.exists(OUTPUT_PDF) and os.path.getsize(OUTPUT_PDF) > 1000:
-        # Copiar tambem para docs/
-        import shutil
-        shutil.copyfile(OUTPUT_PDF, OUTPUT_PDF_DOCS)
-        print(f"PDF consolidado gerado com sucesso!")
-        print(f"1. Raiz: {OUTPUT_PDF} ({os.path.getsize(OUTPUT_PDF)} bytes)")
-        print(f"2. Docs: {OUTPUT_PDF_DOCS}")
-        return True
-    else:
-        print("Erro ao gerar PDF:", res.stderr)
-        return False
+    candidatos = []
+    sistema = platform.system()
+    if sistema == "Darwin":
+        apps = ["Google Chrome", "Microsoft Edge", "Chromium", "Brave Browser"]
+        for raiz in ("/Applications", os.path.expanduser("~/Applications")):
+            candidatos += [os.path.join(raiz, f"{app}.app", "Contents", "MacOS", app) for app in apps]
+    elif sistema == "Windows":
+        for var in ("PROGRAMFILES(X86)", "PROGRAMFILES", "LOCALAPPDATA"):
+            raiz = os.environ.get(var)
+            if raiz:
+                candidatos += [os.path.join(raiz, "Microsoft", "Edge", "Application", "msedge.exe"),
+                               os.path.join(raiz, "Google", "Chrome", "Application", "chrome.exe")]
+    for nome in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser",
+                 "microsoft-edge", "msedge", "chrome", "brave-browser"):
+        candidatos.append(shutil.which(nome))
+
+    return next((c for c in candidatos if c and os.path.isfile(c)), None)
+
+
+def gerar_pdf(navegador):
+    print(f"Gerando PDF com {os.path.basename(navegador)} (headless)...")
+    # Perfil temporario: nao interfere num navegador aberto e nao deixa rastros no perfil do usuario
+    with tempfile.TemporaryDirectory(prefix="finapp-pdf-", ignore_cleanup_errors=True) as temp:
+        pdf_temp = os.path.join(temp, "consolidado.pdf")
+        cmd = [
+            navegador,
+            "--headless",
+            "--disable-gpu",
+            "--no-first-run",
+            "--no-default-browser-check",
+            f"--user-data-dir={os.path.join(temp, 'perfil')}",
+            "--no-pdf-header-footer",           # sem data/URL do navegador; o rodape vem do CSS
+            "--generate-pdf-document-outline",  # marcadores (sumario lateral) no leitor de PDF
+            "--run-all-compositor-stages-before-draw",
+            f"--print-to-pdf={pdf_temp}",
+            Path(OUTPUT_HTML).as_uri(),
+        ]
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
+                                 errors="replace", timeout=180)
+            erro = res.stderr.strip()
+        except subprocess.TimeoutExpired:
+            erro = "o navegador não terminou em 3 minutos"
+
+        if not (os.path.exists(pdf_temp) and os.path.getsize(pdf_temp) > 1000):
+            print("Erro ao gerar o PDF:", erro or "o navegador não criou o arquivo")
+            return False
+        with open(pdf_temp, "rb") as f:
+            if f.read(4) != b"%PDF":
+                print("Erro ao gerar o PDF: o arquivo criado não é um PDF válido")
+                return False
+
+        shutil.copyfile(pdf_temp, OUTPUT_PDF)
+        shutil.copyfile(pdf_temp, OUTPUT_PDF_DOCS)
+
+    print("PDF consolidado gerado com sucesso!")
+    print(f"1. Raiz: {OUTPUT_PDF} ({os.path.getsize(OUTPUT_PDF)} bytes)")
+    print(f"2. Docs: {OUTPUT_PDF_DOCS}")
+    return True
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Gera o PDF consolidado do FinApp a partir de docs/.")
+    parser.add_argument("--data", default=datetime.date.today().strftime("%d/%m/%Y"),
+                        help="data de consolidação mostrada na capa (padrão: hoje, DD/MM/AAAA)")
+    parser.add_argument("--navegador",
+                        help="caminho ou nome do Chrome/Edge/Chromium (padrão: detecta; ou variável PDF_BROWSER)")
+    parser.add_argument("--so-html", action="store_true",
+                        help="gera só o HTML intermediário, sem o PDF")
+    args = parser.parse_args()
+
+    build_html(args.data)
+    if args.so_html:
+        return 0
+
+    navegador = encontrar_navegador(args.navegador)
+    if not navegador:
+        print("Nenhum Chrome, Edge, Chromium ou Brave encontrado. Instale um deles ou indique o "
+              "caminho com --navegador (ou a variável PDF_BROWSER).")
+        return 1
+    return 0 if gerar_pdf(navegador) else 1
+
 
 if __name__ == "__main__":
-    build_html()
+    sys.exit(main())
