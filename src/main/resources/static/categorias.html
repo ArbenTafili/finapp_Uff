@@ -85,6 +85,7 @@
     <p class="subtitle">Use as categorias padrão ou crie as suas</p>
   </div>
   <a class="header-link" href="/">← Transações</a>
+  <button type="button" id="btn-sair" class="header-link" hidden style="border:0;background:none;cursor:pointer;font-family:inherit;margin-left:1rem">Sair</button>
 </header>
 
 <div class="card">
@@ -194,6 +195,26 @@ document.getElementById('lista').addEventListener('click', async ev => {
 });
 
 carregar();
+</script>
+<script>
+// Sessão da conta de teste (só existe na versão publicada): 401 volta ao login e "Sair" aparece quando há sessão
+(function () {
+  const originalFetch = window.fetch;
+  window.fetch = async function () {
+    const resp = await originalFetch.apply(this, arguments);
+    if (resp.status === 401) { window.location.href = '/login.html'; }
+    return resp;
+  };
+  originalFetch('/api/sessao').then(function (r) {
+    if (!r.ok) return;
+    const sair = document.getElementById('btn-sair');
+    sair.hidden = false;
+    sair.addEventListener('click', async function () {
+      await originalFetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    });
+  }).catch(function () {});
+})();
 </script>
 </body>
 </html>
