@@ -27,3 +27,6 @@ Thumbs.db
 *.db
 *.mv.db
 *.trace.db
+
+# PDF consolidado: HTML intermediario gerado por build_consolidated_pdf.py
+Documento_Consolidado_FinApp.html
