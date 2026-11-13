@@ -9,12 +9,12 @@
 
 | Integrante | Papel no Projeto | I1 (Prev. / Real.) | I2 (Prev. / Real.) | I3 (Prev. / Real.) | Total Previsto | Total Real | Desvio |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Filipe** | Gerente de Projeto (GP) & Dev | 10 h / 9 h | 28 h / 28 h | 50 h / 50 h | 88 h | **87 h** | -1 h |
-| **Sara** | Product Owner (PO) | 8 h / 8 h | 26 h / 26 h | 46 h / 45 h | 80 h | **79 h** | -1 h |
-| **Emanuel** | Scrum Master | 4 h / 4 h | 26 h / 24 h | 42 h / 42 h | 72 h | **70 h** | -2 h |
-| **Arben** | Gerente de Configuração | 6 h / 5 h | 30 h / 34 h | 54 h / 52 h | 90 h | **91 h** | +1 h |
-| **Enzo** | Desenvolvedor (Infra/DB/Fullstack) | 12 h / 14 h | 34 h / 42 h | 94 h / 72 h | 140 h | **128 h** | -12 h |
-| **Giovana** | Desenvolvedora (Backend/Frontend) | 10 h / 10 h | 36 h / 36 h | 96 h / 114 h | 142 h | **160 h** | +18 h |
+| **Filipe** | Gerente de Projeto (GP) & Dev | 22 h / 21 h | 28 h / 28 h | 38 h / 38 h | 88 h | **87 h** | -1 h |
+| **Sara** | Product Owner (PO) | 20 h / 20 h | 26 h / 26 h | 34 h / 33 h | 80 h | **79 h** | -1 h |
+| **Emanuel** | Scrum Master | 16 h / 16 h | 26 h / 24 h | 30 h / 30 h | 72 h | **70 h** | -2 h |
+| **Arben** | Gerente de Configuração | 18 h / 17 h | 30 h / 34 h | 42 h / 40 h | 90 h | **91 h** | +1 h |
+| **Enzo** | Desenvolvedor (Infra/DB/Fullstack) | 24 h / 26 h | 34 h / 42 h | 82 h / 60 h | 140 h | **128 h** | -12 h |
+| **Giovana** | Desenvolvedora (Backend/Frontend) | 20 h / 20 h | 36 h / 36 h | 86 h / 104 h | 142 h | **160 h** | +18 h |
 | **Equipe** | **Total Consolidado** | **120 h / 120 h** | **180 h / 190 h** | **312 h / 305 h** | **612 h** | **615 h** | **+3 h (+0,49%)** |
 
 ---
