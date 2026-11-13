@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinApp - Entrar</title>
+<style>
+  :root {
+    --bg: #eef1f6; --surface: #fff; --border: #e5e8ef; --text: #1c2333; --text-muted: #6b7280;
+    --primary: #4f5fed; --primary-dark: #3c4ad1; --despesa: #e0473a; --despesa-soft: #fdecea;
+    --radius: 14px; --shadow: 0 1px 2px rgba(20,24,40,.04), 0 8px 24px rgba(20,24,40,.06);
+  }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', -apple-system, Roboto, Arial, sans-serif; margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: var(--bg); color: var(--text); }
+  main { width: 100%; max-width: 380px; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2rem; }
+  .logo { width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #7c8cff); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(79,95,237,.35); margin-bottom: 1rem; }
+  .logo svg { width: 26px; height: 26px; }
+  h1 { font-size: 1.5rem; margin: 0; letter-spacing: -.02em; }
+  p.subtitle { color: var(--text-muted); margin: .25rem 0 1.5rem; font-size: .92rem; }
+  label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
+  input { width: 100%; padding: .7rem .8rem; font: inherit; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 1rem; background: #fff; color: var(--text); }
+  input:focus { outline: 2px solid var(--primary); outline-offset: 1px; border-color: transparent; }
+  button { width: 100%; padding: .8rem; font: inherit; font-weight: 600; color: #fff; background: var(--primary); border: 0; border-radius: 10px; cursor: pointer; }
+  button:hover { background: var(--primary-dark); }
+  button:disabled { opacity: .6; cursor: wait; }
+  .erro { background: var(--despesa-soft); color: var(--despesa); border-radius: 10px; padding: .65rem .8rem; font-size: .9rem; margin-bottom: 1rem; }
+  .nota { color: var(--text-muted); font-size: .8rem; margin: 1.25rem 0 0; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <div class="logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2.5"></rect><path d="M2 10h20"></path><circle cx="17" cy="15" r="1.4" fill="#fff" stroke="none"></circle></svg>
+  </div>
+  <h1>FinApp</h1>
+  <p class="subtitle">Entre com a conta de teste para acessar o controle financeiro</p>
+
+  <form id="form-login">
+    <div id="erro" class="erro" role="alert" hidden></div>
+    <label for="usuario">Usuário</label>
+    <input id="usuario" name="usuario" autocomplete="username" required autofocus>
+    <label for="senha">Senha</label>
+    <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+    <button type="submit" id="entrar">Entrar</button>
+  </form>
+  <p class="nota">Conta de teste da versão publicada. Usuário e senha foram enviados junto da entrega.</p>
+</main>
+<script>
+  const form = document.getElementById('form-login');
+  const erro = document.getElementById('erro');
+  const botao = document.getElementById('entrar');
+
+  // Quem já tem sessão vai direto para o app
+  fetch('/api/sessao').then(r => { if (r.ok) window.location.replace('/'); }).catch(() => {});
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    erro.hidden = true;
+    botao.disabled = true;
+    try {
+      const resp = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ usuario: form.usuario.value.trim(), senha: form.senha.value })
+      });
+      if (resp.ok) { window.location.replace('/'); return; }
+      erro.textContent = resp.status === 401 ? 'Usuário ou senha incorretos.' : 'Não foi possível entrar. Tente novamente.';
+    } catch (err) {
+      erro.textContent = 'Sem conexão com o servidor. Tente novamente.';
+    }
+    erro.hidden = false;
+    botao.disabled = false;
+    form.senha.select();
+  });
+</script>
+</body>
+</html>

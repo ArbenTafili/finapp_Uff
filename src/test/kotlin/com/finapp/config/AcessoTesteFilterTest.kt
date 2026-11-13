@@ -1,6 +1,10 @@
 package com.finapp.config
 
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpSession
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -25,11 +29,50 @@ class AcessoTesteFilterTest(@Autowired private val mockMvc: MockMvc) {
         "Basic " + Base64.getEncoder().encodeToString("$usuario:$senha".toByteArray())
 
     @Test
-    fun `deve exigir credenciais e informar o desafio Basic`() {
+    fun `api sem credenciais responde 401 sem abrir o pop-up do navegador`() {
         mockMvc.perform(get("/api/categorias"))
             .andExpect(status().isUnauthorized)
-            .andExpect(header().exists("WWW-Authenticate"))
-        mockMvc.perform(get("/")).andExpect(status().isUnauthorized)
+            .andExpect(header().doesNotExist("WWW-Authenticate"))
+    }
+
+    @Test
+    fun `paginas sem sessao redirecionam para a tela de login`() {
+        mockMvc.perform(get("/"))
+            .andExpect(status().isFound)
+            .andExpect(header().string("Location", "/login.html"))
+        mockMvc.perform(get("/metas.html")).andExpect(status().isFound)
+    }
+
+    @Test
+    fun `tela de login e acessivel sem autenticacao`() {
+        mockMvc.perform(get("/login.html")).andExpect(status().isOk)
+    }
+
+    private fun login(usuario: String, senha: String) =
+        post("/api/login").contentType(MediaType.APPLICATION_JSON)
+            .content("""{"usuario":"$usuario","senha":"$senha"}""")
+
+    @Test
+    fun `login correto cria sessao que libera a api e logout encerra`() {
+        val sessao = mockMvc.perform(login("teste", "s3nh@-de-teste"))
+            .andExpect(status().isOk)
+            .andReturn().request.getSession(false) as MockHttpSession
+
+        mockMvc.perform(get("/api/categorias").session(sessao)).andExpect(status().isOk)
+        mockMvc.perform(get("/api/sessao").session(sessao)).andExpect(status().isOk)
+
+        mockMvc.perform(post("/api/logout").session(sessao)).andExpect(status().isNoContent)
+        mockMvc.perform(get("/api/categorias").session(sessao)).andExpect(status().isUnauthorized)
+    }
+
+    @Test
+    fun `login com senha errada, usuario errado ou corpo vazio e recusado sem criar sessao`() {
+        for (corpo in listOf(login("teste", "errada"), login("outro", "s3nh@-de-teste"), login("", ""))) {
+            val resultado = mockMvc.perform(corpo).andExpect(status().isUnauthorized).andReturn()
+            assertNull(resultado.request.getSession(false)?.getAttribute(AcessoTesteFilter.ATRIBUTO_SESSAO))
+        }
+        mockMvc.perform(post("/api/login").contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .andExpect(status().isUnauthorized)
     }
 
     @Test

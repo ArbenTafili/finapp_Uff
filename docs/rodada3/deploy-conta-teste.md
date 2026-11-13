@@ -1,6 +1,6 @@
 # Publicação e conta de teste — Rodada 3
 
-O sistema publicado exige a **conta de teste** (HTTP Basic: o navegador pede usuário e senha ao abrir o endereço). Ela existe só para a banca/avaliadores acessarem a versão publicada; o FinApp continua sem cadastro de usuários (fora do escopo, ver ADR 001 e o documento de escopo), e os dados ficam no PostgreSQL da própria hospedagem (RNF03).
+O sistema publicado exige a **conta de teste**: ao abrir o endereço, o usuário cai na tela de login (`/login.html`) e informa usuário e senha; a sessão fica num cookie HttpOnly (8 h) e há um botão "Sair". Clientes de API (curl) ainda podem usar HTTP Basic. Ela existe só para a banca/avaliadores acessarem a versão publicada; o FinApp continua sem cadastro de usuários (fora do escopo, ver ADR 001 e o documento de escopo), e os dados ficam no PostgreSQL da própria hospedagem (RNF03).
 
 ## Opção A — Render (recomendada, `render.yaml` na raiz)
 
