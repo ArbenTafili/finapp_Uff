@@ -2,7 +2,7 @@
 
 **Registro:** [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13)  
 **Requisito relacionado:** RNF03 — armazenamento local dos dados  
-**Estado:** decisão técnica adotada; registro sujeito à revisão da equipe
+**Estado:** aprovada na Rodada 2
 
 ## Contexto
 
@@ -19,4 +19,4 @@ Usar PostgreSQL executado localmente via Docker Compose como mecanismo de persis
 - **Escopo:** a decisão explicita a implementação técnica do RNF03, sem alterar os requisitos funcionais.
 - **Documentação:** este registro e a [Seção 8 do Plano de Projeto](../plano-projeto/secao-8-controle-versoes.md) dão rastreabilidade à [Issue #13](https://github.com/ArbenTafili/finapp_Uff/issues/13).
 
-Horas, custo e data de aprovação não foram informados e não são atribuídos neste registro.
+**Custo:** cerca de 8 h a mais na Rodada 2 com a configuração dos contêineres e do Flyway (ver [monitoramento](../rodada3/04-monitoramento-consolidado.md)).

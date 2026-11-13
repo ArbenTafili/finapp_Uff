@@ -24,15 +24,15 @@ O leve desvio no Dia 1 (114h reais vs 108h planejadas) ocorreu devido a ajustes 
 
 | Métrica | Descrição | Valor |
 |---|---|---|
-| **PV (Planned Value)** | Valor planejado até o momento de medição. | R$ 0,00 |
-| **EV (Earned Value)** | Valor agregado correspondente ao percentual físico concluído. | R$ 0,00 |
-| **AC (Actual Cost)** | Custo real incorrido (horas reais trabalhadas). | R$ 0,00 |
+| **PV (Planned Value)** | Valor planejado até o momento de medição. | R$ 6.000,00 (120 h) |
+| **EV (Earned Value)** | Valor agregado correspondente ao percentual físico concluído. | R$ 6.000,00 (120 h) |
+| **AC (Actual Cost)** | Custo real incorrido (horas reais trabalhadas). | R$ 6.000,00 (120 h) |
 | **SV (Schedule Variance)** | Variação de Prazos (EV - PV). | R$ 0,00 |
 | **CV (Cost Variance)** | Variação de Custos (EV - AC). | R$ 0,00 |
-| **SPI (EV/PV)** | Índice de Desempenho de Prazo (> 1.0 indica adiantado). | 1.00 |
-| **CPI (EV/AC)** | Índice de Desempenho de Custo (> 1.0 indica economia). | 1.00 |
+| **SPI (EV/PV)** | Índice de Desempenho de Prazo (> 1.0 indica adiantado). | 1,00 |
+| **CPI (EV/AC)** | Índice de Desempenho de Custo (> 1.0 indica economia). | 1,00 |
 
 **Status Operacional da Rodada:** No prazo / No custo.
 
 **Análise do GP:** 
-*(Exemplo: O projeto encerra a Rodada 1 com SPI de 1.0 e CPI de 1.0, indicando que estamos rigorosamente dentro do prazo e do orçamento previstos).*
+A Rodada 1 terminou com 120 h previstas e 120 h gastas (PV = EV = AC = R$ 6.000,00; SPI e CPI iguais a 1,00). O atraso do início, causado pelo setup do ambiente, foi recuperado até 10/09.

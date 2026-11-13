@@ -1,6 +1,6 @@
 # Histórico de versões — FinApp (Rodada 3)
 
-Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da integração dos PRs #58 a #66 da Rodada 3; o merge do #67 é marcado pela tag `v1.0.1`). Os hashes e as tags permitem reproduzir cada versão com `git checkout <hash>` ou `git checkout <tag>`.
+Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da integração dos PRs #58 a #67 da Rodada 3; o merge do #68 é marcado pela tag `v1.0.2`). Os hashes e as tags permitem reproduzir cada versão com `git checkout <hash>` ou `git checkout <tag>`.
 
 ## Marcos do produto
 
@@ -10,6 +10,7 @@ Fonte: `git log origin/main --first-parent` (atualizado em 2026-11-13, depois da
 | Demo v2 | `v0.2.0` | Rodada 2 (início de out/2026) | `7c96a25` (merge #55, 06/10) | RF01 e RF02 concluídos, Flyway/PostgreSQL, relatório mensal na API (RF03 parcial) |
 | Demo v3 / final | `v1.0.0` | Rodada 3 (nov/2026) | Merge do PR #66 (este histórico) na `main` (13/11) | RF03 interface, RF04 metas, RF05 exportação CSV, gestão de categorias, deploy com conta de teste, tela de login (#62), testes ampliados (#61, suíte com 130 testes) e EAP revisada (#59) |
 | Final, documentação revisada | `v1.0.1` | Rodada 3 (nov/2026) | Merge do PR #67 na `main` (13/11) | Mesmo código da `v1.0.0`; PDF consolidado gerado de novo com o histórico de versões e as horas atualizados, e script do PDF para macOS, Windows e Linux |
+| Final, relatório formal | `v1.0.2` | Rodada 3 (nov/2026) | Merge do PR #68 na `main` (13/11) | Mesmo código da `v1.0.0`; consolidado em formato de relatório (ABNT) com sumário paginado, visão geral das três entregas com burndown geral, artefatos das Rodadas 1 e 2 incluídos, slides da Rodada 2 na `main` e correções de dados nos documentos |
 
 O código da Demo v1 entrou na `develop` pelo PR #2 (`d9e37a2`, 05/09) e chegou à `main` no merge do PR #9 (`db71473`). O código-fonte dos dois commits é idêntico; a tag `v0.1.0` fica no commit da `main`.
 
@@ -25,11 +26,14 @@ git push origin v0.1.0 v0.2.0 v1.0.0
 
 git tag -a v1.0.1 origin/main -m "Entrega final - PDF consolidado atualizado"   # merge do PR #67
 git push origin v1.0.1
+
+git tag -a v1.0.2 origin/main -m "Entrega final - relatorio consolidado em formato ABNT"   # merge do PR #68
+git push origin v1.0.2
 ```
 
-A `v1.0.1` é uma revisão de patch: não muda o código da aplicação, só o PDF consolidado e o script que o gera. A tag `v1.0.0` continua no merge do #66, sem ser movida.
+As `v1.0.1` e `v1.0.2` são revisões de patch: não mudam o código da aplicação, só os documentos, o PDF consolidado e o script que o gera. A tag `v1.0.0` continua no merge do #66, sem ser movida.
 
-Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.1` mostra o commit da versão final mais recente.
+Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.2` mostra o commit da versão final mais recente.
 
 ## Branches da Rodada 3
 
@@ -50,15 +54,21 @@ Conferência: `git tag -n` lista as tags com a mensagem; `git show v1.0.1` mostr
 | `docs/roteiro-demo-v3-login` | #65 | Roteiro da Demo v3 com acesso pela tela de login; suíte com 130 testes, 0 falhas (13/11) | 1.2 · 4.9 |
 | `docs/historico-versoes-horas` | #66 | Histórico de versões, tags `v0.1.0`/`v0.2.0`/`v1.0.0` e horas da Rodada 3 | 1.1 · 1.6 |
 | `docs/pdf-consolidado-multiplataforma` | #67 | Script do PDF consolidado para macOS, Windows e Linux, PDF gerado de novo e tag `v1.0.1` | 1.6 |
+| `docs/consolidado-visao-entregas` | #68 | Visão geral das três entregas com burndown geral, formato de relatório (ABNT) com sumário paginado, correções nos documentos, slides da Rodada 2 trazidos da `develop` e tag `v1.0.2` | 1.6 |
 
-Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → #66 → #67.
+Ordem de integração na `main` em 13/11: #61 → #59 → #62 → #63 → #64 → #65 → #66 → #67 → #68.
+
+A Demo v3 foi apresentada em 28/10 a partir das branches da Rodada 3. A integração na `main` foi feita entre 09/11 e 13/11, junto com a tela de login, os testes finais e a documentação consolidada.
 
 Convenção de commits mantida: `tipo(escopo): descrição #issue`. Nas Rodadas 1 e 2 o fluxo foi branch → PR → `develop` → `main`; na Rodada 3 as branches foram integradas direto na `main` por PR, com a `release/rodada3` concentrando as funcionalidades (ver `docs/adr/estrategia-branches.md`).
+
+Os PRs #56 (slides da Rodada 2) e #57 (cronograma e orçamento) foram integrados só na `develop`, depois do último merge `develop` → `main` (#55). Os slides da Rodada 2 chegaram à `main` no #68; o cronograma do #57 foi substituído pela versão consolidada do #63.
 
 ## Histórico da `main` (primeiro pai, do mais recente ao mais antigo)
 
 | Commit | Data | Autor | Mensagem |
 |---|---|---|---|
+| `221caa1` · **v1.0.1** | 2026-11-13 | Arben | build(pdf): PDF consolidado no macOS/Windows/Linux e regerado com o histórico atualizado (#67) |
 | `47ed64c` · **v1.0.0** | 2026-11-13 | Arben | docs: histórico de versões (PRs #58 a #65), tags e horas da Rodada 3 (#66) |
 | `68b32ef` | 2026-11-13 | Sara | docs(demo): atualiza roteiro da Demo v3 (#65) |
 | `5587a38` | 2026-11-13 | Giovana | docs: update README and difficulties document with deployment details and authentication changes (#64) |

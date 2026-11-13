@@ -163,7 +163,7 @@ xychart-beta
 
 ### 4.1 Desempenho de Prazos (Cronograma)
 *   **SPI Final: 1,00 | Variação de Prazo (SV): 0 horas.**
-*   O projeto cumpriu rigorosamente todas as datas marco (Milestones) acordadas:
+*   Os três marcos foram cumpridos nas datas do cronograma (14/09, 06/10 e 28/10). A única atividade atrasada foi a migração para Docker e PostgreSQL (+5 dias, ver [cronograma](../plano-projeto/secao-5-cronograma-orcamento.md)), sem mudar a data da Demo v2:
     *   **Demo v1 (14/09):** Concluída dentro do prazo (120h).
     *   **Demo v2 (06/10):** Entregue com adiantamento técnico do RF03 (SV = +4h acumulado), permitindo acomodar a curva de testes da rodada seguinte.
     *   **Demo v3 / Entrega Final (28/10):** 100% do escopo funcional (RF01 a RF05) e não funcional (RNF01 a RNF05) entregue e homologado.
@@ -171,16 +171,16 @@ xychart-beta
 ### 4.2 Desempenho de Custos (Orçamento)
 *   **CPI Final: 0,995 (~1,00) | Variação de Custo (CV): -3 horas (-R$ 150,00).**
 *   **Custo Total Final Real (AC):** R$ 30.750,00 frente a um baseline planejado (BAC) de R$ 30.600,00.
-*   **Avaliação do Desvio:** A variação final de R$ 150,00 (3 horas em um projeto de 612 horas) representa um desvio irrisório de **+0,49%**, situando-se muito abaixo da margem de contingência padrão de 5%.
+*   **Avaliação do desvio:** o custo final ficou R$ 150,00 acima do previsto (3 h em 612 h, **+0,49%**), dentro da margem de contingência de 5%.
 *   **Causa Raiz do Desvio Temporário:** Na Rodada 2, a migração arquitetural para Docker/PostgreSQL (RDT-01) gerou ~8 horas extras de configuração de contêineres e scripts Flyway, derrubando o CPI temporariamente para 0,98.
-*   **Eficácia das Ações Corretivas:** Conforme planejado pelo GP, a superação da curva de aprendizado da infraestrutura permitiu que na Rodada 3 a equipe operasse em alta produtividade (AC da I3 = 305h vs 312h planejadas), recuperando o índice de custo de volta para 1,00.
+*   **Ações corretivas:** com o Docker já configurado, a Rodada 3 usou 305 h das 312 h previstas, e o CPI acumulado voltou para 0,995.
 
 ### 4.3 Aderência ao Escopo e Qualidade
 *   **Requisitos Funcionais:** 100% entregues:
     *   *RF01 (Transações):* CRUD completo com validações de data (`<= hoje`) e valor positivo.
     *   *RF02 (Categorias):* Categorias padrão protegidas e personalizadas completas.
-    *   *RF03 (Relatórios):* Agregações mensais em banco, gráfico de rosca interativo e tempo de carregamento < 3s (RNF02).
+    *   *RF03 (Relatórios):* Agregações mensais em banco e gráfico de rosca interativo. O RNF02 (relatório em menos de 3 s) é verificado pelo teste automatizado `RelatorioControllerTest`, que gera o relatório de um mês numa base de 20 mil transações em PostgreSQL.
     *   *RF04 (Metas de Economia):* Cadastro, acompanhamento automático via saldo acumulado e status dinâmico.
     *   *RF05 (Exportação CSV):* Filtro por intervalo de datas, sanitização e acentuação correta.
-*   **Qualidade e Cobertura:** 109 testes automatizados verdes (`./gradlew test`), cobrindo testes unitários de domínio, serviços e testes de integração com PostgreSQL.
-*   **Publicação:** Aplicação publicada na nuvem com autenticação de segurança para a banca avaliadora via HTTP Basic.
+*   **Qualidade:** 130 testes automatizados passando em 13/11 (`./gradlew test`), entre testes unitários de domínio, de serviços e de integração com PostgreSQL.
+*   **Publicação:** aplicação no Render com conta de teste e tela de login (PR #62); o HTTP Basic ficou só para chamadas de API.
